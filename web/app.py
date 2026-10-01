@@ -12,6 +12,7 @@ from fastapi.templating import Jinja2Templates
 from database.db import db
 from monetizer.affiliate import monetizer
 from config.settings import settings
+from engine.product_resolver import ProductResolver
 
 BASE_DIR = Path(__file__).resolve().parent
 templates = Jinja2Templates(directory=str(BASE_DIR / "templates"))
@@ -27,11 +28,13 @@ app = FastAPI(
 async def index_page(request: Request, marketplace: Optional[str] = Query(None)):
     """Homepage: Minimalist feed of recent price drops and system glitches."""
     deals = db.get_latest_deals(limit=40, marketplace=marketplace)
+    radar_items = db.get_active_radar_items()
     return templates.TemplateResponse(
         request=request,
         name="index.html",
         context={
             "deals": deals,
+            "radar_items": radar_items,
             "current_market": marketplace,
         },
     )
@@ -95,18 +98,55 @@ class RadarRequest(BaseModel):
 
 @app.post("/api/radar")
 async def add_to_radar(req: RadarRequest):
-    """Registers a product URL or search term into the active tracking radar."""
-    if not req.target_input or len(req.target_input.strip()) < 3:
-        raise HTTPException(status_code=400, detail="Informe um link de produto ou nome válido com pelo menos 3 caracteres.")
+    """Registers and verifies a product URL or search term into the active tracking radar."""
+    clean_input = (req.target_input or "").strip()
+    if not clean_input or len(clean_input) < 3:
+        raise HTTPException(
+            status_code=400,
+            detail="Informe um link de produto ou nome válido com pelo menos 3 caracteres."
+        )
 
+    # 1. Real-time product existence verification
+    resolved = ProductResolver.resolve(clean_input)
+    if not resolved:
+        raise HTTPException(
+            status_code=404,
+            detail=f"Produto não encontrado! Não localizamos nenhum item na Amazon ou Mercado Livre para '{clean_input}'. Verifique se o nome está correto ou cole o link direto do produto."
+        )
+
+    # 2. Add to radar_items with verified canonical metadata
     item = db.add_radar_item(
-        target_input=req.target_input,
+        target_input=clean_input,
         desired_price=req.desired_price,
         user_contact=req.user_contact,
+        title=resolved["title"],
+        image_url=resolved.get("image_url"),
+        last_price=resolved.get("current_price"),
+        marketplace=resolved["marketplace"],
     )
+
+    # 3. Ensure product is registered in database for automated background sweeps
+    if resolved.get("product_id") and resolved.get("url"):
+        db.upsert_product(
+            marketplace=resolved["marketplace"],
+            product_id=resolved["product_id"],
+            title=resolved["title"],
+            url=resolved["url"],
+            image_url=resolved.get("image_url"),
+            category="Radar",
+        )
+        if resolved.get("current_price") and resolved["current_price"] > 0:
+            db.record_price(
+                marketplace=resolved["marketplace"],
+                product_id=resolved["product_id"],
+                price=resolved["current_price"],
+            )
+
     return {
         "status": "success",
-        "message": f"Produto adicionado ao Radar com sucesso! Nosso agente passará a monitorá-lo 24h por dia.",
+        "verified": True,
+        "message": "Produto verificado e adicionado ao Radar com sucesso!",
+        "product": resolved,
         "item": item,
     }
 

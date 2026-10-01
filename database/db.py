@@ -89,7 +89,15 @@ class PriceDatabase:
                 )
             """)
 
+            # Auto-migrate radar_items columns
+            for col, col_type in [("title", "TEXT"), ("image_url", "TEXT"), ("last_price", "REAL")]:
+                try:
+                    cursor.execute(f"ALTER TABLE radar_items ADD COLUMN {col} {col_type}")
+                except sqlite3.OperationalError:
+                    pass
+
             conn.commit()
+
 
 
     def upsert_product(
@@ -305,35 +313,64 @@ class PriceDatabase:
         target_input: str,
         desired_price: Optional[float] = None,
         user_contact: Optional[str] = None,
+        title: Optional[str] = None,
+        image_url: Optional[str] = None,
+        last_price: Optional[float] = None,
+        marketplace: Optional[str] = None,
     ) -> Dict[str, Any]:
-        """Adds a product URL or search term to the radar tracking queue."""
+        """Adds or updates a product URL or search term in the radar tracking queue."""
         target_clean = target_input.strip()
-        marketplace = "all"
-        target_lower = target_clean.lower()
-        if "amazon.com" in target_lower or "amzn." in target_lower:
-            marketplace = "amazon"
-        elif "mercadolivre.com" in target_lower or "mercadolibre.com" in target_lower:
-            marketplace = "mercadolivre"
-        elif "shopee.com" in target_lower:
-            marketplace = "shopee"
+        mkt = marketplace or "all"
+        if mkt == "all":
+            target_lower = target_clean.lower()
+            if "amazon.com" in target_lower or "amzn." in target_lower:
+                mkt = "amazon"
+            elif "mercadolivre.com" in target_lower or "mercadolibre.com" in target_lower:
+                mkt = "mercadolivre"
+            elif "shopee.com" in target_lower:
+                mkt = "shopee"
 
         with self._get_connection() as conn:
             cursor = conn.cursor()
+            # Check if target already exists
             cursor.execute("""
-                INSERT INTO radar_items (target_input, marketplace, desired_price, user_contact, status)
-                VALUES (?, ?, ?, ?, 'active')
-            """, (target_clean, marketplace, desired_price, user_contact))
+                SELECT id FROM radar_items
+                WHERE target_input = ? AND status = 'active'
+                LIMIT 1
+            """, (target_clean,))
+            existing = cursor.fetchone()
+
+            if existing:
+                item_id = existing["id"]
+                cursor.execute("""
+                    UPDATE radar_items
+                    SET title = coalesce(?, title),
+                        image_url = coalesce(?, image_url),
+                        last_price = coalesce(?, last_price),
+                        desired_price = coalesce(?, desired_price)
+                    WHERE id = ?
+                """, (title, image_url, last_price, desired_price, item_id))
+            else:
+                cursor.execute("""
+                    INSERT INTO radar_items (target_input, marketplace, desired_price, user_contact, status, title, image_url, last_price)
+                    VALUES (?, ?, ?, ?, 'active', ?, ?, ?)
+                """, (target_clean, mkt, desired_price, user_contact, title, image_url, last_price))
+                item_id = cursor.lastrowid
+
             conn.commit()
-            item_id = cursor.lastrowid
 
             return {
                 "id": item_id,
                 "target_input": target_clean,
-                "marketplace": marketplace,
+                "marketplace": mkt,
                 "desired_price": desired_price,
                 "user_contact": user_contact,
+                "title": title or target_clean,
+                "image_url": image_url,
+                "last_price": last_price,
                 "status": "active",
             }
+
 
     def get_active_radar_items(self) -> List[Dict[str, Any]]:
         """Retrieves all active items from the radar queue."""

@@ -34,13 +34,15 @@ def export_to_github_pages(output_dir: Path = DOCS_DIR, limit_deals: int = 60) -
 
     env = Environment(loader=FileSystemLoader(str(TEMPLATES_DIR)))
 
-    # Fetch latest deals from database
+    # Fetch latest deals and active radar items from database
     deals = db.get_latest_deals(limit=limit_deals)
+    radar_items = db.get_active_radar_items()
 
     # 2. Render index.html (Homepage)
     index_template = env.get_template("index.html")
     index_html = index_template.render(
         deals=deals,
+        radar_items=radar_items,
         base_path="./",
         is_static=True,
         current_market=None,
