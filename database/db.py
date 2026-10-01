@@ -76,7 +76,21 @@ class PriceDatabase:
                 ON alerts_sent(marketplace, product_id, sent_at)
             """)
 
+            # Table: radar_items (user requested products/links to track)
+            cursor.execute("""
+                CREATE TABLE IF NOT EXISTS radar_items (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    target_input TEXT NOT NULL,
+                    marketplace TEXT DEFAULT 'all',
+                    desired_price REAL,
+                    user_contact TEXT,
+                    status TEXT DEFAULT 'active',
+                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                )
+            """)
+
             conn.commit()
+
 
     def upsert_product(
         self,
@@ -286,7 +300,54 @@ class PriceDatabase:
                 """, (limit,))
             return [dict(row) for row in cursor.fetchall()]
 
+    def add_radar_item(
+        self,
+        target_input: str,
+        desired_price: Optional[float] = None,
+        user_contact: Optional[str] = None,
+    ) -> Dict[str, Any]:
+        """Adds a product URL or search term to the radar tracking queue."""
+        target_clean = target_input.strip()
+        marketplace = "all"
+        target_lower = target_clean.lower()
+        if "amazon.com" in target_lower or "amzn." in target_lower:
+            marketplace = "amazon"
+        elif "mercadolivre.com" in target_lower or "mercadolibre.com" in target_lower:
+            marketplace = "mercadolivre"
+        elif "shopee.com" in target_lower:
+            marketplace = "shopee"
+
+        with self._get_connection() as conn:
+            cursor = conn.cursor()
+            cursor.execute("""
+                INSERT INTO radar_items (target_input, marketplace, desired_price, user_contact, status)
+                VALUES (?, ?, ?, ?, 'active')
+            """, (target_clean, marketplace, desired_price, user_contact))
+            conn.commit()
+            item_id = cursor.lastrowid
+
+            return {
+                "id": item_id,
+                "target_input": target_clean,
+                "marketplace": marketplace,
+                "desired_price": desired_price,
+                "user_contact": user_contact,
+                "status": "active",
+            }
+
+    def get_active_radar_items(self) -> List[Dict[str, Any]]:
+        """Retrieves all active items from the radar queue."""
+        with self._get_connection() as conn:
+            cursor = conn.cursor()
+            cursor.execute("""
+                SELECT * FROM radar_items
+                WHERE status = 'active'
+                ORDER BY created_at DESC
+            """)
+            return [dict(row) for row in cursor.fetchall()]
+
 
 # Global database instance
 db = PriceDatabase()
+
 

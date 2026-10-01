@@ -66,6 +66,41 @@
     </p>
 </div>
 
+<!-- Componente do Radar de Ofertas Personalizado -->
+<div class="mb-10 max-w-3xl mx-auto bg-gradient-to-r from-slate-900 via-slate-900 to-slate-850 border border-emerald-500/30 rounded-2xl p-6 sm:p-7 shadow-2xl shadow-emerald-950/20 relative overflow-hidden">
+    <div class="absolute -right-10 -bottom-10 w-36 h-36 bg-emerald-500/10 rounded-full blur-2xl pointer-events-none"></div>
+    <div class="flex items-center gap-2 mb-2">
+        <span class="text-xl">🎯</span>
+        <h2 class="text-base sm:text-lg font-bold text-white tracking-tight">Colocar Produto no Nosso Radar</h2>
+        <span class="ml-auto text-[10px] font-bold uppercase tracking-wider bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 px-2 py-0.5 rounded-full">
+            Monitoramento 24h
+        </span>
+    </div>
+    <p class="text-xs text-slate-400 mb-4">
+        Não encontrou o que procura? Cole o link da Amazon ou Mercado Livre, ou digite o nome do produto. Nosso robô passará a rastrear quedas e bugs para você.
+    </p>
+
+    <form id="radar-form" onsubmit="submitRadar(event)" class="flex flex-col sm:flex-row gap-3">
+        <input 
+            type="text" 
+            id="radar-input" 
+            required 
+            placeholder="Ex: Kindle 11ª geração ou cole o link do produto..." 
+            class="flex-grow bg-slate-950 border border-slate-700 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 text-sm text-white placeholder-slate-500 rounded-xl px-4 py-2.5 outline-none transition"
+        >
+        <button 
+            type="submit" 
+            id="radar-btn" 
+            class="bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs uppercase tracking-wider px-6 py-2.5 rounded-xl transition duration-150 flex items-center justify-center gap-1.5 shadow-lg shadow-emerald-500/20 shrink-0"
+        >
+            <span>🔔</span> Ativar Radar
+        </button>
+    </form>
+
+    <!-- Feedback Message -->
+    <div id="radar-feedback" class="hidden mt-3 text-xs p-3 rounded-xl"></div>
+</div>
+
 <!-- Filtros de Marketplace (Funciona dinâmico e estático) -->
 <div class="flex items-center justify-center gap-2 mb-8">
     <button onclick="filterMarket('all')" id="tab-all" class="market-btn px-4 py-1.5 rounded-lg text-xs font-semibold transition bg-emerald-500 text-slate-950">
@@ -74,6 +109,7 @@
     <button onclick="filterMarket('amazon')" id="tab-amazon" class="market-btn px-4 py-1.5 rounded-lg text-xs font-semibold transition bg-slate-800 text-slate-300 hover:bg-slate-700">
         Amazon 🛒
     </button>
+
     <button onclick="filterMarket('mercadolivre')" id="tab-mercadolivre" class="market-btn px-4 py-1.5 rounded-lg text-xs font-semibold transition bg-slate-800 text-slate-300 hover:bg-slate-700">
         Mercado Livre 💛
     </button>
@@ -82,6 +118,551 @@
 <!-- Grid de Ofertas -->
 
 <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+    
+    <div data-market="amazon" class="deal-card bg-slate-900 border border-slate-800 hover:border-slate-700 rounded-xl overflow-hidden flex flex-col transition duration-200 hover:-translate-y-1 shadow-lg">
+        <!-- Imagem e Badges -->
+        <div class="relative bg-white/5 h-48 flex items-center justify-center p-4 overflow-hidden">
+            
+            <img src="https://m.media-amazon.com/images/I/61UjplmhfJL._AC_UL320_.jpg" alt="JBL, Fone de Ouvido Bluetooth Over-Ear, Tune 730BT, Sem Fio, Até 76 Horas de Bateria - Azul" class="max-h-full max-w-full object-contain" loading="lazy">
+            
+
+            <!-- Badge de Queda -->
+            
+            <div class="absolute top-2.5 right-2.5 bg-red-600 text-white font-extrabold text-xs px-2 py-0.5 rounded shadow">
+                -39%
+            </div>
+            
+
+            <!-- Badge Marketplace -->
+            <div class="absolute top-2.5 left-2.5">
+                
+                <span class="bg-amber-500/90 text-slate-950 text-[10px] font-bold px-2 py-0.5 rounded">Amazon</span>
+                
+            </div>
+        </div>
+
+        <!-- Conteúdo do Card -->
+        <div class="p-4 flex flex-col flex-grow">
+            <!-- Título -->
+            <h3 class="text-sm font-medium text-slate-200 line-clamp-2 mb-3 leading-snug" title="JBL, Fone de Ouvido Bluetooth Over-Ear, Tune 730BT, Sem Fio, Até 76 Horas de Bateria - Azul">
+                JBL, Fone de Ouvido Bluetooth Over-Ear, Tune 730BT, Sem Fio, Até 76 Horas de Bateria - Azul
+            </h3>
+
+            <!-- Bloco de Preço -->
+            <div class="mt-auto pt-2 border-t border-slate-800/80">
+                
+                <div class="text-xs text-slate-500 line-through">
+                    De R$ 399,00
+                </div>
+                
+                <div class="text-xl font-black text-emerald-400">
+                    R$ 244,51
+                </div>
+                <div class="text-[11px] text-slate-400 mt-1">
+                    Detectado em: 2026-10-01 22:26
+                </div>
+            </div>
+
+            <!-- Botão Ver Linha do Tempo -->
+            <a href="./p/amazon/B0GR1DZZZX/" class="mt-4 w-full text-center py-2 px-3 rounded-lg text-xs font-bold bg-slate-800 hover:bg-emerald-600 text-slate-200 hover:text-white transition flex items-center justify-center gap-1.5">
+                <span>📊</span> Ver Linha do Tempo
+            </a>
+        </div>
+    </div>
+    
+    <div data-market="mercadolivre" class="deal-card bg-slate-900 border border-slate-800 hover:border-slate-700 rounded-xl overflow-hidden flex flex-col transition duration-200 hover:-translate-y-1 shadow-lg">
+        <!-- Imagem e Badges -->
+        <div class="relative bg-white/5 h-48 flex items-center justify-center p-4 overflow-hidden">
+            
+            <img src="https://http2.mlstatic.com/D_Q_NP_2X_836942-MLA111992080643_052026-AB.webp" alt="Quartzolit Manta Líquida Branca 1 8 K G P/ Lajes E Telhas. Acabamento Fosco Cor Branco" class="max-h-full max-w-full object-contain" loading="lazy">
+            
+
+            <!-- Badge de Queda -->
+            
+            <div class="absolute top-2.5 right-2.5 bg-red-600 text-white font-extrabold text-xs px-2 py-0.5 rounded shadow">
+                -42%
+            </div>
+            
+
+            <!-- Badge Marketplace -->
+            <div class="absolute top-2.5 left-2.5">
+                
+                <span class="bg-yellow-400 text-slate-950 text-[10px] font-bold px-2 py-0.5 rounded">Mercado Livre</span>
+                
+            </div>
+        </div>
+
+        <!-- Conteúdo do Card -->
+        <div class="p-4 flex flex-col flex-grow">
+            <!-- Título -->
+            <h3 class="text-sm font-medium text-slate-200 line-clamp-2 mb-3 leading-snug" title="Quartzolit Manta Líquida Branca 1 8 K G P/ Lajes E Telhas. Acabamento Fosco Cor Branco">
+                Quartzolit Manta Líquida Branca 1 8 K G P/ Lajes E Telhas. Acabamento Fosco Cor Branco
+            </h3>
+
+            <!-- Bloco de Preço -->
+            <div class="mt-auto pt-2 border-t border-slate-800/80">
+                
+                <div class="text-xs text-slate-500 line-through">
+                    De R$ 322,52
+                </div>
+                
+                <div class="text-xl font-black text-emerald-400">
+                    R$ 187,78
+                </div>
+                <div class="text-[11px] text-slate-400 mt-1">
+                    Detectado em: 2026-10-01 21:54
+                </div>
+            </div>
+
+            <!-- Botão Ver Linha do Tempo -->
+            <a href="./p/mercadolivre/MLB43809788/" class="mt-4 w-full text-center py-2 px-3 rounded-lg text-xs font-bold bg-slate-800 hover:bg-emerald-600 text-slate-200 hover:text-white transition flex items-center justify-center gap-1.5">
+                <span>📊</span> Ver Linha do Tempo
+            </a>
+        </div>
+    </div>
+    
+    <div data-market="amazon" class="deal-card bg-slate-900 border border-slate-800 hover:border-slate-700 rounded-xl overflow-hidden flex flex-col transition duration-200 hover:-translate-y-1 shadow-lg">
+        <!-- Imagem e Badges -->
+        <div class="relative bg-white/5 h-48 flex items-center justify-center p-4 overflow-hidden">
+            
+            <img src="https://m.media-amazon.com/images/I/51+8JuX2-EL._AC_UL320_.jpg" alt="Full Circle Conjunto de escova de limpeza eletrônica 3 em 1 Control Alt Clean e limpador de tela" class="max-h-full max-w-full object-contain" loading="lazy">
+            
+
+            <!-- Badge de Queda -->
+            
+
+            <!-- Badge Marketplace -->
+            <div class="absolute top-2.5 left-2.5">
+                
+                <span class="bg-amber-500/90 text-slate-950 text-[10px] font-bold px-2 py-0.5 rounded">Amazon</span>
+                
+            </div>
+        </div>
+
+        <!-- Conteúdo do Card -->
+        <div class="p-4 flex flex-col flex-grow">
+            <!-- Título -->
+            <h3 class="text-sm font-medium text-slate-200 line-clamp-2 mb-3 leading-snug" title="Full Circle Conjunto de escova de limpeza eletrônica 3 em 1 Control Alt Clean e limpador de tela">
+                Full Circle Conjunto de escova de limpeza eletrônica 3 em 1 Control Alt Clean e limpador de tela
+            </h3>
+
+            <!-- Bloco de Preço -->
+            <div class="mt-auto pt-2 border-t border-slate-800/80">
+                
+                <div class="text-xl font-black text-emerald-400">
+                    R$ 39,13
+                </div>
+                <div class="text-[11px] text-slate-400 mt-1">
+                    Detectado em: 2026-10-01 21:24
+                </div>
+            </div>
+
+            <!-- Botão Ver Linha do Tempo -->
+            <a href="./p/amazon/B076Y6SCZR/" class="mt-4 w-full text-center py-2 px-3 rounded-lg text-xs font-bold bg-slate-800 hover:bg-emerald-600 text-slate-200 hover:text-white transition flex items-center justify-center gap-1.5">
+                <span>📊</span> Ver Linha do Tempo
+            </a>
+        </div>
+    </div>
+    
+    <div data-market="amazon" class="deal-card bg-slate-900 border border-slate-800 hover:border-slate-700 rounded-xl overflow-hidden flex flex-col transition duration-200 hover:-translate-y-1 shadow-lg">
+        <!-- Imagem e Badges -->
+        <div class="relative bg-white/5 h-48 flex items-center justify-center p-4 overflow-hidden">
+            
+            <img src="https://m.media-amazon.com/images/I/71lmspbfiCL._AC_UL320_.jpg" alt="KNIPEX Corte oblíquo eletrônico" class="max-h-full max-w-full object-contain" loading="lazy">
+            
+
+            <!-- Badge de Queda -->
+            
+
+            <!-- Badge Marketplace -->
+            <div class="absolute top-2.5 left-2.5">
+                
+                <span class="bg-amber-500/90 text-slate-950 text-[10px] font-bold px-2 py-0.5 rounded">Amazon</span>
+                
+            </div>
+        </div>
+
+        <!-- Conteúdo do Card -->
+        <div class="p-4 flex flex-col flex-grow">
+            <!-- Título -->
+            <h3 class="text-sm font-medium text-slate-200 line-clamp-2 mb-3 leading-snug" title="KNIPEX Corte oblíquo eletrônico">
+                KNIPEX Corte oblíquo eletrônico
+            </h3>
+
+            <!-- Bloco de Preço -->
+            <div class="mt-auto pt-2 border-t border-slate-800/80">
+                
+                <div class="text-xl font-black text-emerald-400">
+                    R$ 300,40
+                </div>
+                <div class="text-[11px] text-slate-400 mt-1">
+                    Detectado em: 2026-10-01 21:24
+                </div>
+            </div>
+
+            <!-- Botão Ver Linha do Tempo -->
+            <a href="./p/amazon/B005EXO5CC/" class="mt-4 w-full text-center py-2 px-3 rounded-lg text-xs font-bold bg-slate-800 hover:bg-emerald-600 text-slate-200 hover:text-white transition flex items-center justify-center gap-1.5">
+                <span>📊</span> Ver Linha do Tempo
+            </a>
+        </div>
+    </div>
+    
+    <div data-market="mercadolivre" class="deal-card bg-slate-900 border border-slate-800 hover:border-slate-700 rounded-xl overflow-hidden flex flex-col transition duration-200 hover:-translate-y-1 shadow-lg">
+        <!-- Imagem e Badges -->
+        <div class="relative bg-white/5 h-48 flex items-center justify-center p-4 overflow-hidden">
+            
+            <img src="https://http2.mlstatic.com/D_Q_NP_2X_786778-MLB112049880039_052026-AB-kit-10-pares-de-meias-lupo-soquete-invisivel-sport.webp" alt="Kit 10 Pares De Meias Lupo Soquete Invisível Sport" class="max-h-full max-w-full object-contain" loading="lazy">
+            
+
+            <!-- Badge de Queda -->
+            
+            <div class="absolute top-2.5 right-2.5 bg-red-600 text-white font-extrabold text-xs px-2 py-0.5 rounded shadow">
+                -52%
+            </div>
+            
+
+            <!-- Badge Marketplace -->
+            <div class="absolute top-2.5 left-2.5">
+                
+                <span class="bg-yellow-400 text-slate-950 text-[10px] font-bold px-2 py-0.5 rounded">Mercado Livre</span>
+                
+            </div>
+        </div>
+
+        <!-- Conteúdo do Card -->
+        <div class="p-4 flex flex-col flex-grow">
+            <!-- Título -->
+            <h3 class="text-sm font-medium text-slate-200 line-clamp-2 mb-3 leading-snug" title="Kit 10 Pares De Meias Lupo Soquete Invisível Sport">
+                Kit 10 Pares De Meias Lupo Soquete Invisível Sport
+            </h3>
+
+            <!-- Bloco de Preço -->
+            <div class="mt-auto pt-2 border-t border-slate-800/80">
+                
+                <div class="text-xs text-slate-500 line-through">
+                    De R$ 159,87
+                </div>
+                
+                <div class="text-xl font-black text-emerald-400">
+                    R$ 76,25
+                </div>
+                <div class="text-[11px] text-slate-400 mt-1">
+                    Detectado em: 2026-10-01 21:24
+                </div>
+            </div>
+
+            <!-- Botão Ver Linha do Tempo -->
+            <a href="./p/mercadolivre/MLB1231146019/" class="mt-4 w-full text-center py-2 px-3 rounded-lg text-xs font-bold bg-slate-800 hover:bg-emerald-600 text-slate-200 hover:text-white transition flex items-center justify-center gap-1.5">
+                <span>📊</span> Ver Linha do Tempo
+            </a>
+        </div>
+    </div>
+    
+    <div data-market="mercadolivre" class="deal-card bg-slate-900 border border-slate-800 hover:border-slate-700 rounded-xl overflow-hidden flex flex-col transition duration-200 hover:-translate-y-1 shadow-lg">
+        <!-- Imagem e Badges -->
+        <div class="relative bg-white/5 h-48 flex items-center justify-center p-4 overflow-hidden">
+            
+            <img src="https://http2.mlstatic.com/D_Q_NP_2X_718229-MLA113595305320_072026-AB.webp" alt="Mochila sem gênero, impermeável, reforçada, com capacidade ampliada de 30-42L, adequada para portátil, viagens diárias, cor preta" class="max-h-full max-w-full object-contain" loading="lazy">
+            
+
+            <!-- Badge de Queda -->
+            
+            <div class="absolute top-2.5 right-2.5 bg-red-600 text-white font-extrabold text-xs px-2 py-0.5 rounded shadow">
+                -60%
+            </div>
+            
+
+            <!-- Badge Marketplace -->
+            <div class="absolute top-2.5 left-2.5">
+                
+                <span class="bg-yellow-400 text-slate-950 text-[10px] font-bold px-2 py-0.5 rounded">Mercado Livre</span>
+                
+            </div>
+        </div>
+
+        <!-- Conteúdo do Card -->
+        <div class="p-4 flex flex-col flex-grow">
+            <!-- Título -->
+            <h3 class="text-sm font-medium text-slate-200 line-clamp-2 mb-3 leading-snug" title="Mochila sem gênero, impermeável, reforçada, com capacidade ampliada de 30-42L, adequada para portátil, viagens diárias, cor preta">
+                Mochila sem gênero, impermeável, reforçada, com capacidade ampliada de 30-42L, adequada para portátil, viagens diárias, cor preta
+            </h3>
+
+            <!-- Bloco de Preço -->
+            <div class="mt-auto pt-2 border-t border-slate-800/80">
+                
+                <div class="text-xs text-slate-500 line-through">
+                    De R$ 216,00
+                </div>
+                
+                <div class="text-xl font-black text-emerald-400">
+                    R$ 86,84
+                </div>
+                <div class="text-[11px] text-slate-400 mt-1">
+                    Detectado em: 2026-10-01 21:24
+                </div>
+            </div>
+
+            <!-- Botão Ver Linha do Tempo -->
+            <a href="./p/mercadolivre/MLB75625924/" class="mt-4 w-full text-center py-2 px-3 rounded-lg text-xs font-bold bg-slate-800 hover:bg-emerald-600 text-slate-200 hover:text-white transition flex items-center justify-center gap-1.5">
+                <span>📊</span> Ver Linha do Tempo
+            </a>
+        </div>
+    </div>
+    
+    <div data-market="amazon" class="deal-card bg-slate-900 border border-slate-800 hover:border-slate-700 rounded-xl overflow-hidden flex flex-col transition duration-200 hover:-translate-y-1 shadow-lg">
+        <!-- Imagem e Badges -->
+        <div class="relative bg-white/5 h-48 flex items-center justify-center p-4 overflow-hidden">
+            
+            <img src="https://m.media-amazon.com/images/I/71DV-cq1atL._AC_UL320_.jpg" alt="Splin Suporte All In One Tomada Para Smart Speaker Alexa Echo Dot 5 ou 4 - Amazon - Modelo Compacto 3.0 (preto)" class="max-h-full max-w-full object-contain" loading="lazy">
+            
+
+            <!-- Badge de Queda -->
+            
+            <div class="absolute top-2.5 right-2.5 bg-red-600 text-white font-extrabold text-xs px-2 py-0.5 rounded shadow">
+                -18%
+            </div>
+            
+
+            <!-- Badge Marketplace -->
+            <div class="absolute top-2.5 left-2.5">
+                
+                <span class="bg-amber-500/90 text-slate-950 text-[10px] font-bold px-2 py-0.5 rounded">Amazon</span>
+                
+            </div>
+        </div>
+
+        <!-- Conteúdo do Card -->
+        <div class="p-4 flex flex-col flex-grow">
+            <!-- Título -->
+            <h3 class="text-sm font-medium text-slate-200 line-clamp-2 mb-3 leading-snug" title="Splin Suporte All In One Tomada Para Smart Speaker Alexa Echo Dot 5 ou 4 - Amazon - Modelo Compacto 3.0 (preto)">
+                Splin Suporte All In One Tomada Para Smart Speaker Alexa Echo Dot 5 ou 4 - Amazon - Modelo Compacto 3.0 (preto)
+            </h3>
+
+            <!-- Bloco de Preço -->
+            <div class="mt-auto pt-2 border-t border-slate-800/80">
+                
+                <div class="text-xs text-slate-500 line-through">
+                    De R$ 39,90
+                </div>
+                
+                <div class="text-xl font-black text-emerald-400">
+                    R$ 32,93
+                </div>
+                <div class="text-[11px] text-slate-400 mt-1">
+                    Detectado em: 2026-10-01 20:53
+                </div>
+            </div>
+
+            <!-- Botão Ver Linha do Tempo -->
+            <a href="./p/amazon/B0BQJPT5B2/" class="mt-4 w-full text-center py-2 px-3 rounded-lg text-xs font-bold bg-slate-800 hover:bg-emerald-600 text-slate-200 hover:text-white transition flex items-center justify-center gap-1.5">
+                <span>📊</span> Ver Linha do Tempo
+            </a>
+        </div>
+    </div>
+    
+    <div data-market="mercadolivre" class="deal-card bg-slate-900 border border-slate-800 hover:border-slate-700 rounded-xl overflow-hidden flex flex-col transition duration-200 hover:-translate-y-1 shadow-lg">
+        <!-- Imagem e Badges -->
+        <div class="relative bg-white/5 h-48 flex items-center justify-center p-4 overflow-hidden">
+            
+            <img src="https://http2.mlstatic.com/D_Q_NP_2X_695434-MLA96086402077_102025-AB.webp" alt="Tênis Esportivo Feminino Voa 2 Olympikus Liso" class="max-h-full max-w-full object-contain" loading="lazy">
+            
+
+            <!-- Badge de Queda -->
+            
+            <div class="absolute top-2.5 right-2.5 bg-red-600 text-white font-extrabold text-xs px-2 py-0.5 rounded shadow">
+                -42%
+            </div>
+            
+
+            <!-- Badge Marketplace -->
+            <div class="absolute top-2.5 left-2.5">
+                
+                <span class="bg-yellow-400 text-slate-950 text-[10px] font-bold px-2 py-0.5 rounded">Mercado Livre</span>
+                
+            </div>
+        </div>
+
+        <!-- Conteúdo do Card -->
+        <div class="p-4 flex flex-col flex-grow">
+            <!-- Título -->
+            <h3 class="text-sm font-medium text-slate-200 line-clamp-2 mb-3 leading-snug" title="Tênis Esportivo Feminino Voa 2 Olympikus Liso">
+                Tênis Esportivo Feminino Voa 2 Olympikus Liso
+            </h3>
+
+            <!-- Bloco de Preço -->
+            <div class="mt-auto pt-2 border-t border-slate-800/80">
+                
+                <div class="text-xs text-slate-500 line-through">
+                    De R$ 329,99
+                </div>
+                
+                <div class="text-xl font-black text-emerald-400">
+                    R$ 192,59
+                </div>
+                <div class="text-[11px] text-slate-400 mt-1">
+                    Detectado em: 2026-10-01 20:23
+                </div>
+            </div>
+
+            <!-- Botão Ver Linha do Tempo -->
+            <a href="./p/mercadolivre/MLB48933313/" class="mt-4 w-full text-center py-2 px-3 rounded-lg text-xs font-bold bg-slate-800 hover:bg-emerald-600 text-slate-200 hover:text-white transition flex items-center justify-center gap-1.5">
+                <span>📊</span> Ver Linha do Tempo
+            </a>
+        </div>
+    </div>
+    
+    <div data-market="mercadolivre" class="deal-card bg-slate-900 border border-slate-800 hover:border-slate-700 rounded-xl overflow-hidden flex flex-col transition duration-200 hover:-translate-y-1 shadow-lg">
+        <!-- Imagem e Badges -->
+        <div class="relative bg-white/5 h-48 flex items-center justify-center p-4 overflow-hidden">
+            
+            <img src="https://http2.mlstatic.com/D_Q_NP_2X_962853-MLA117324398277_092026-AB.webp" alt="Suporte De Cabeça Para Celular Grave Com As Mãos Livres Tarefas do Dia A Dia Preto" class="max-h-full max-w-full object-contain" loading="lazy">
+            
+
+            <!-- Badge de Queda -->
+            
+            <div class="absolute top-2.5 right-2.5 bg-red-600 text-white font-extrabold text-xs px-2 py-0.5 rounded shadow">
+                -58%
+            </div>
+            
+
+            <!-- Badge Marketplace -->
+            <div class="absolute top-2.5 left-2.5">
+                
+                <span class="bg-yellow-400 text-slate-950 text-[10px] font-bold px-2 py-0.5 rounded">Mercado Livre</span>
+                
+            </div>
+        </div>
+
+        <!-- Conteúdo do Card -->
+        <div class="p-4 flex flex-col flex-grow">
+            <!-- Título -->
+            <h3 class="text-sm font-medium text-slate-200 line-clamp-2 mb-3 leading-snug" title="Suporte De Cabeça Para Celular Grave Com As Mãos Livres Tarefas do Dia A Dia Preto">
+                Suporte De Cabeça Para Celular Grave Com As Mãos Livres Tarefas do Dia A Dia Preto
+            </h3>
+
+            <!-- Bloco de Preço -->
+            <div class="mt-auto pt-2 border-t border-slate-800/80">
+                
+                <div class="text-xs text-slate-500 line-through">
+                    De R$ 169,31
+                </div>
+                
+                <div class="text-xl font-black text-emerald-400">
+                    R$ 72,00
+                </div>
+                <div class="text-[11px] text-slate-400 mt-1">
+                    Detectado em: 2026-10-01 20:23
+                </div>
+            </div>
+
+            <!-- Botão Ver Linha do Tempo -->
+            <a href="./p/mercadolivre/MLB77538233/" class="mt-4 w-full text-center py-2 px-3 rounded-lg text-xs font-bold bg-slate-800 hover:bg-emerald-600 text-slate-200 hover:text-white transition flex items-center justify-center gap-1.5">
+                <span>📊</span> Ver Linha do Tempo
+            </a>
+        </div>
+    </div>
+    
+    <div data-market="mercadolivre" class="deal-card bg-slate-900 border border-slate-800 hover:border-slate-700 rounded-xl overflow-hidden flex flex-col transition duration-200 hover:-translate-y-1 shadow-lg">
+        <!-- Imagem e Badges -->
+        <div class="relative bg-white/5 h-48 flex items-center justify-center p-4 overflow-hidden">
+            
+            <img src="https://http2.mlstatic.com/D_Q_NP_2X_641445-MLA107256158981_022026-AB.webp" alt="Impressora Multifuncional HP DeskJet Ink Advantage 2975 Colorida 1 USB 2.0 de alta velocidade Wi-Fi de banda dupla - 100 a 240 VCA - AJ4Y4A#AK4" class="max-h-full max-w-full object-contain" loading="lazy">
+            
+
+            <!-- Badge de Queda -->
+            
+            <div class="absolute top-2.5 right-2.5 bg-red-600 text-white font-extrabold text-xs px-2 py-0.5 rounded shadow">
+                -38%
+            </div>
+            
+
+            <!-- Badge Marketplace -->
+            <div class="absolute top-2.5 left-2.5">
+                
+                <span class="bg-yellow-400 text-slate-950 text-[10px] font-bold px-2 py-0.5 rounded">Mercado Livre</span>
+                
+            </div>
+        </div>
+
+        <!-- Conteúdo do Card -->
+        <div class="p-4 flex flex-col flex-grow">
+            <!-- Título -->
+            <h3 class="text-sm font-medium text-slate-200 line-clamp-2 mb-3 leading-snug" title="Impressora Multifuncional HP DeskJet Ink Advantage 2975 Colorida 1 USB 2.0 de alta velocidade Wi-Fi de banda dupla - 100 a 240 VCA - AJ4Y4A#AK4">
+                Impressora Multifuncional HP DeskJet Ink Advantage 2975 Colorida 1 USB 2.0 de alta velocidade Wi-Fi de banda dupla - 100 a 240 VCA - AJ4Y4A#AK4
+            </h3>
+
+            <!-- Bloco de Preço -->
+            <div class="mt-auto pt-2 border-t border-slate-800/80">
+                
+                <div class="text-xs text-slate-500 line-through">
+                    De R$ 712,86
+                </div>
+                
+                <div class="text-xl font-black text-emerald-400">
+                    R$ 440,91
+                </div>
+                <div class="text-[11px] text-slate-400 mt-1">
+                    Detectado em: 2026-10-01 20:23
+                </div>
+            </div>
+
+            <!-- Botão Ver Linha do Tempo -->
+            <a href="./p/mercadolivre/MLB62998911/" class="mt-4 w-full text-center py-2 px-3 rounded-lg text-xs font-bold bg-slate-800 hover:bg-emerald-600 text-slate-200 hover:text-white transition flex items-center justify-center gap-1.5">
+                <span>📊</span> Ver Linha do Tempo
+            </a>
+        </div>
+    </div>
+    
+    <div data-market="amazon" class="deal-card bg-slate-900 border border-slate-800 hover:border-slate-700 rounded-xl overflow-hidden flex flex-col transition duration-200 hover:-translate-y-1 shadow-lg">
+        <!-- Imagem e Badges -->
+        <div class="relative bg-white/5 h-48 flex items-center justify-center p-4 overflow-hidden">
+            
+            <img src="https://m.media-amazon.com/images/I/61DFgTmj9xL._AC_UL320_.jpg" alt="Fone de Ouvido Sem Fio, JBL, Bluetooth, Wave Beam 2, Intra Auricular, Sem Fio, Resistente À Água e Poeira - Preto" class="max-h-full max-w-full object-contain" loading="lazy">
+            
+
+            <!-- Badge de Queda -->
+            
+            <div class="absolute top-2.5 right-2.5 bg-red-600 text-white font-extrabold text-xs px-2 py-0.5 rounded shadow">
+                -31%
+            </div>
+            
+
+            <!-- Badge Marketplace -->
+            <div class="absolute top-2.5 left-2.5">
+                
+                <span class="bg-amber-500/90 text-slate-950 text-[10px] font-bold px-2 py-0.5 rounded">Amazon</span>
+                
+            </div>
+        </div>
+
+        <!-- Conteúdo do Card -->
+        <div class="p-4 flex flex-col flex-grow">
+            <!-- Título -->
+            <h3 class="text-sm font-medium text-slate-200 line-clamp-2 mb-3 leading-snug" title="Fone de Ouvido Sem Fio, JBL, Bluetooth, Wave Beam 2, Intra Auricular, Sem Fio, Resistente À Água e Poeira - Preto">
+                Fone de Ouvido Sem Fio, JBL, Bluetooth, Wave Beam 2, Intra Auricular, Sem Fio, Resistente À Água e Poeira - Preto
+            </h3>
+
+            <!-- Bloco de Preço -->
+            <div class="mt-auto pt-2 border-t border-slate-800/80">
+                
+                <div class="text-xs text-slate-500 line-through">
+                    De R$ 369,00
+                </div>
+                
+                <div class="text-xl font-black text-emerald-400">
+                    R$ 254,89
+                </div>
+                <div class="text-[11px] text-slate-400 mt-1">
+                    Detectado em: 2026-10-01 19:53
+                </div>
+            </div>
+
+            <!-- Botão Ver Linha do Tempo -->
+            <a href="./p/amazon/B0DHL93XCN/" class="mt-4 w-full text-center py-2 px-3 rounded-lg text-xs font-bold bg-slate-800 hover:bg-emerald-600 text-slate-200 hover:text-white transition flex items-center justify-center gap-1.5">
+                <span>📊</span> Ver Linha do Tempo
+            </a>
+        </div>
+    </div>
     
     <div data-market="mercadolivre" class="deal-card bg-slate-900 border border-slate-800 hover:border-slate-700 rounded-xl overflow-hidden flex flex-col transition duration-200 hover:-translate-y-1 shadow-lg">
         <!-- Imagem e Badges -->
@@ -2582,567 +3163,6 @@
         </div>
     </div>
     
-    <div data-market="mercadolivre" class="deal-card bg-slate-900 border border-slate-800 hover:border-slate-700 rounded-xl overflow-hidden flex flex-col transition duration-200 hover:-translate-y-1 shadow-lg">
-        <!-- Imagem e Badges -->
-        <div class="relative bg-white/5 h-48 flex items-center justify-center p-4 overflow-hidden">
-            
-            <img src="https://http2.mlstatic.com/D_Q_NP_2X_959030-MLA99595836842_122025-AB.webp" alt="Whey Isolate Protein Fuse 1,8kg Chocolate Dark Lab" class="max-h-full max-w-full object-contain" loading="lazy">
-            
-
-            <!-- Badge de Queda -->
-            
-            <div class="absolute top-2.5 right-2.5 bg-red-600 text-white font-extrabold text-xs px-2 py-0.5 rounded shadow">
-                -74%
-            </div>
-            
-
-            <!-- Badge Marketplace -->
-            <div class="absolute top-2.5 left-2.5">
-                
-                <span class="bg-yellow-400 text-slate-950 text-[10px] font-bold px-2 py-0.5 rounded">Mercado Livre</span>
-                
-            </div>
-        </div>
-
-        <!-- Conteúdo do Card -->
-        <div class="p-4 flex flex-col flex-grow">
-            <!-- Título -->
-            <h3 class="text-sm font-medium text-slate-200 line-clamp-2 mb-3 leading-snug" title="Whey Isolate Protein Fuse 1,8kg Chocolate Dark Lab">
-                Whey Isolate Protein Fuse 1,8kg Chocolate Dark Lab
-            </h3>
-
-            <!-- Bloco de Preço -->
-            <div class="mt-auto pt-2 border-t border-slate-800/80">
-                
-                <div class="text-xs text-slate-500 line-through">
-                    De R$ 699,90
-                </div>
-                
-                <div class="text-xl font-black text-emerald-400">
-                    R$ 179,90
-                </div>
-                <div class="text-[11px] text-slate-400 mt-1">
-                    Detectado em: 2026-10-01 10:11
-                </div>
-            </div>
-
-            <!-- Botão Ver Linha do Tempo -->
-            <a href="./p/mercadolivre/MLB19140416/" class="mt-4 w-full text-center py-2 px-3 rounded-lg text-xs font-bold bg-slate-800 hover:bg-emerald-600 text-slate-200 hover:text-white transition flex items-center justify-center gap-1.5">
-                <span>📊</span> Ver Linha do Tempo
-            </a>
-        </div>
-    </div>
-    
-    <div data-market="mercadolivre" class="deal-card bg-slate-900 border border-slate-800 hover:border-slate-700 rounded-xl overflow-hidden flex flex-col transition duration-200 hover:-translate-y-1 shadow-lg">
-        <!-- Imagem e Badges -->
-        <div class="relative bg-white/5 h-48 flex items-center justify-center p-4 overflow-hidden">
-            
-            <img src="https://http2.mlstatic.com/D_Q_NP_2X_798945-MLA112454329586_062026-AB.webp" alt="Câmera de Segurança Wi-Fi iCSee/Yoosee A28B 4K Dupla Lente Visão Noturna Colorida Full Hd Externa Prova D'água Ip66 Sensor Movimento Woosh" class="max-h-full max-w-full object-contain" loading="lazy">
-            
-
-            <!-- Badge de Queda -->
-            
-            <div class="absolute top-2.5 right-2.5 bg-red-600 text-white font-extrabold text-xs px-2 py-0.5 rounded shadow">
-                -69%
-            </div>
-            
-
-            <!-- Badge Marketplace -->
-            <div class="absolute top-2.5 left-2.5">
-                
-                <span class="bg-yellow-400 text-slate-950 text-[10px] font-bold px-2 py-0.5 rounded">Mercado Livre</span>
-                
-            </div>
-        </div>
-
-        <!-- Conteúdo do Card -->
-        <div class="p-4 flex flex-col flex-grow">
-            <!-- Título -->
-            <h3 class="text-sm font-medium text-slate-200 line-clamp-2 mb-3 leading-snug" title="Câmera de Segurança Wi-Fi iCSee/Yoosee A28B 4K Dupla Lente Visão Noturna Colorida Full Hd Externa Prova D'água Ip66 Sensor Movimento Woosh">
-                Câmera de Segurança Wi-Fi iCSee/Yoosee A28B 4K Dupla Lente Visão Noturna Colorida Full Hd Externa Prova D'água Ip66 Sensor Movimento Woosh
-            </h3>
-
-            <!-- Bloco de Preço -->
-            <div class="mt-auto pt-2 border-t border-slate-800/80">
-                
-                <div class="text-xs text-slate-500 line-through">
-                    De R$ 399,00
-                </div>
-                
-                <div class="text-xl font-black text-emerald-400">
-                    R$ 124,71
-                </div>
-                <div class="text-[11px] text-slate-400 mt-1">
-                    Detectado em: 2026-10-01 10:11
-                </div>
-            </div>
-
-            <!-- Botão Ver Linha do Tempo -->
-            <a href="./p/mercadolivre/MLB60074213/" class="mt-4 w-full text-center py-2 px-3 rounded-lg text-xs font-bold bg-slate-800 hover:bg-emerald-600 text-slate-200 hover:text-white transition flex items-center justify-center gap-1.5">
-                <span>📊</span> Ver Linha do Tempo
-            </a>
-        </div>
-    </div>
-    
-    <div data-market="mercadolivre" class="deal-card bg-slate-900 border border-slate-800 hover:border-slate-700 rounded-xl overflow-hidden flex flex-col transition duration-200 hover:-translate-y-1 shadow-lg">
-        <!-- Imagem e Badges -->
-        <div class="relative bg-white/5 h-48 flex items-center justify-center p-4 overflow-hidden">
-            
-            <img src="https://http2.mlstatic.com/D_Q_NP_2X_948762-MLA114998537162_082026-AB.webp" alt="Escova modeladora/cacheadora Gokoco GD037 rosa" class="max-h-full max-w-full object-contain" loading="lazy">
-            
-
-            <!-- Badge de Queda -->
-            
-            <div class="absolute top-2.5 right-2.5 bg-red-600 text-white font-extrabold text-xs px-2 py-0.5 rounded shadow">
-                -53%
-            </div>
-            
-
-            <!-- Badge Marketplace -->
-            <div class="absolute top-2.5 left-2.5">
-                
-                <span class="bg-yellow-400 text-slate-950 text-[10px] font-bold px-2 py-0.5 rounded">Mercado Livre</span>
-                
-            </div>
-        </div>
-
-        <!-- Conteúdo do Card -->
-        <div class="p-4 flex flex-col flex-grow">
-            <!-- Título -->
-            <h3 class="text-sm font-medium text-slate-200 line-clamp-2 mb-3 leading-snug" title="Escova modeladora/cacheadora Gokoco GD037 rosa">
-                Escova modeladora/cacheadora Gokoco GD037 rosa
-            </h3>
-
-            <!-- Bloco de Preço -->
-            <div class="mt-auto pt-2 border-t border-slate-800/80">
-                
-                <div class="text-xs text-slate-500 line-through">
-                    De R$ 399,00
-                </div>
-                
-                <div class="text-xl font-black text-emerald-400">
-                    R$ 189,00
-                </div>
-                <div class="text-[11px] text-slate-400 mt-1">
-                    Detectado em: 2026-10-01 10:11
-                </div>
-            </div>
-
-            <!-- Botão Ver Linha do Tempo -->
-            <a href="./p/mercadolivre/MLB77612240/" class="mt-4 w-full text-center py-2 px-3 rounded-lg text-xs font-bold bg-slate-800 hover:bg-emerald-600 text-slate-200 hover:text-white transition flex items-center justify-center gap-1.5">
-                <span>📊</span> Ver Linha do Tempo
-            </a>
-        </div>
-    </div>
-    
-    <div data-market="mercadolivre" class="deal-card bg-slate-900 border border-slate-800 hover:border-slate-700 rounded-xl overflow-hidden flex flex-col transition duration-200 hover:-translate-y-1 shadow-lg">
-        <!-- Imagem e Badges -->
-        <div class="relative bg-white/5 h-48 flex items-center justify-center p-4 overflow-hidden">
-            
-            <img src="https://http2.mlstatic.com/D_Q_NP_2X_956285-MLA115392782062_082026-AB.webp" alt="Parafusadeira Furadeira Impacto Sem Fio 2 Baterias Recarregável 48v Bivolt Velocidade Ajustavel Com Travas Mandril Resistente Woosh" class="max-h-full max-w-full object-contain" loading="lazy">
-            
-
-            <!-- Badge de Queda -->
-            
-            <div class="absolute top-2.5 right-2.5 bg-red-600 text-white font-extrabold text-xs px-2 py-0.5 rounded shadow">
-                -76%
-            </div>
-            
-
-            <!-- Badge Marketplace -->
-            <div class="absolute top-2.5 left-2.5">
-                
-                <span class="bg-yellow-400 text-slate-950 text-[10px] font-bold px-2 py-0.5 rounded">Mercado Livre</span>
-                
-            </div>
-        </div>
-
-        <!-- Conteúdo do Card -->
-        <div class="p-4 flex flex-col flex-grow">
-            <!-- Título -->
-            <h3 class="text-sm font-medium text-slate-200 line-clamp-2 mb-3 leading-snug" title="Parafusadeira Furadeira Impacto Sem Fio 2 Baterias Recarregável 48v Bivolt Velocidade Ajustavel Com Travas Mandril Resistente Woosh">
-                Parafusadeira Furadeira Impacto Sem Fio 2 Baterias Recarregável 48v Bivolt Velocidade Ajustavel Com Travas Mandril Resistente Woosh
-            </h3>
-
-            <!-- Bloco de Preço -->
-            <div class="mt-auto pt-2 border-t border-slate-800/80">
-                
-                <div class="text-xs text-slate-500 line-through">
-                    De R$ 499,99
-                </div>
-                
-                <div class="text-xl font-black text-emerald-400">
-                    R$ 118,74
-                </div>
-                <div class="text-[11px] text-slate-400 mt-1">
-                    Detectado em: 2026-10-01 10:11
-                </div>
-            </div>
-
-            <!-- Botão Ver Linha do Tempo -->
-            <a href="./p/mercadolivre/MLB64896669/" class="mt-4 w-full text-center py-2 px-3 rounded-lg text-xs font-bold bg-slate-800 hover:bg-emerald-600 text-slate-200 hover:text-white transition flex items-center justify-center gap-1.5">
-                <span>📊</span> Ver Linha do Tempo
-            </a>
-        </div>
-    </div>
-    
-    <div data-market="mercadolivre" class="deal-card bg-slate-900 border border-slate-800 hover:border-slate-700 rounded-xl overflow-hidden flex flex-col transition duration-200 hover:-translate-y-1 shadow-lg">
-        <!-- Imagem e Badges -->
-        <div class="relative bg-white/5 h-48 flex items-center justify-center p-4 overflow-hidden">
-            
-            <img src="https://http2.mlstatic.com/D_Q_NP_2X_998259-MLA101940918202_122025-AB.webp" alt="Adaptador Tomada 20a P/ 10a Carregador Carro Elétrico Bivolt Two Lef" class="max-h-full max-w-full object-contain" loading="lazy">
-            
-
-            <!-- Badge de Queda -->
-            
-            <div class="absolute top-2.5 right-2.5 bg-red-600 text-white font-extrabold text-xs px-2 py-0.5 rounded shadow">
-                -71%
-            </div>
-            
-
-            <!-- Badge Marketplace -->
-            <div class="absolute top-2.5 left-2.5">
-                
-                <span class="bg-yellow-400 text-slate-950 text-[10px] font-bold px-2 py-0.5 rounded">Mercado Livre</span>
-                
-            </div>
-        </div>
-
-        <!-- Conteúdo do Card -->
-        <div class="p-4 flex flex-col flex-grow">
-            <!-- Título -->
-            <h3 class="text-sm font-medium text-slate-200 line-clamp-2 mb-3 leading-snug" title="Adaptador Tomada 20a P/ 10a Carregador Carro Elétrico Bivolt Two Lef">
-                Adaptador Tomada 20a P/ 10a Carregador Carro Elétrico Bivolt Two Lef
-            </h3>
-
-            <!-- Bloco de Preço -->
-            <div class="mt-auto pt-2 border-t border-slate-800/80">
-                
-                <div class="text-xs text-slate-500 line-through">
-                    De R$ 69,89
-                </div>
-                
-                <div class="text-xl font-black text-emerald-400">
-                    R$ 20,26
-                </div>
-                <div class="text-[11px] text-slate-400 mt-1">
-                    Detectado em: 2026-10-01 10:11
-                </div>
-            </div>
-
-            <!-- Botão Ver Linha do Tempo -->
-            <a href="./p/mercadolivre/MLB63479886/" class="mt-4 w-full text-center py-2 px-3 rounded-lg text-xs font-bold bg-slate-800 hover:bg-emerald-600 text-slate-200 hover:text-white transition flex items-center justify-center gap-1.5">
-                <span>📊</span> Ver Linha do Tempo
-            </a>
-        </div>
-    </div>
-    
-    <div data-market="mercadolivre" class="deal-card bg-slate-900 border border-slate-800 hover:border-slate-700 rounded-xl overflow-hidden flex flex-col transition duration-200 hover:-translate-y-1 shadow-lg">
-        <!-- Imagem e Badges -->
-        <div class="relative bg-white/5 h-48 flex items-center justify-center p-4 overflow-hidden">
-            
-            <img src="https://http2.mlstatic.com/D_Q_NP_2X_926296-MLA99483685310_112025-AB.webp" alt="Jogo de Panelas 5 Peças Antiaderente Cerâmico Grafite Mimo Style - Conjunto Completo" class="max-h-full max-w-full object-contain" loading="lazy">
-            
-
-            <!-- Badge de Queda -->
-            
-            <div class="absolute top-2.5 right-2.5 bg-red-600 text-white font-extrabold text-xs px-2 py-0.5 rounded shadow">
-                -52%
-            </div>
-            
-
-            <!-- Badge Marketplace -->
-            <div class="absolute top-2.5 left-2.5">
-                
-                <span class="bg-yellow-400 text-slate-950 text-[10px] font-bold px-2 py-0.5 rounded">Mercado Livre</span>
-                
-            </div>
-        </div>
-
-        <!-- Conteúdo do Card -->
-        <div class="p-4 flex flex-col flex-grow">
-            <!-- Título -->
-            <h3 class="text-sm font-medium text-slate-200 line-clamp-2 mb-3 leading-snug" title="Jogo de Panelas 5 Peças Antiaderente Cerâmico Grafite Mimo Style - Conjunto Completo">
-                Jogo de Panelas 5 Peças Antiaderente Cerâmico Grafite Mimo Style - Conjunto Completo
-            </h3>
-
-            <!-- Bloco de Preço -->
-            <div class="mt-auto pt-2 border-t border-slate-800/80">
-                
-                <div class="text-xs text-slate-500 line-through">
-                    De R$ 504,40
-                </div>
-                
-                <div class="text-xl font-black text-emerald-400">
-                    R$ 244,00
-                </div>
-                <div class="text-[11px] text-slate-400 mt-1">
-                    Detectado em: 2026-10-01 10:11
-                </div>
-            </div>
-
-            <!-- Botão Ver Linha do Tempo -->
-            <a href="./p/mercadolivre/MLB43328371/" class="mt-4 w-full text-center py-2 px-3 rounded-lg text-xs font-bold bg-slate-800 hover:bg-emerald-600 text-slate-200 hover:text-white transition flex items-center justify-center gap-1.5">
-                <span>📊</span> Ver Linha do Tempo
-            </a>
-        </div>
-    </div>
-    
-    <div data-market="mercadolivre" class="deal-card bg-slate-900 border border-slate-800 hover:border-slate-700 rounded-xl overflow-hidden flex flex-col transition duration-200 hover:-translate-y-1 shadow-lg">
-        <!-- Imagem e Badges -->
-        <div class="relative bg-white/5 h-48 flex items-center justify-center p-4 overflow-hidden">
-            
-            <img src="https://http2.mlstatic.com/D_Q_NP_2X_604175-MLA113496610054_072026-AB.webp" alt="PENTA MAGNÉSIO - Bisglicinato + Dimalato + Citrato + Taurato + Óxido de Magnésio - A Combinação Perfeita de 5 Magnésios com Máxima Pureza e Biodisponibilidade - 60 Cápsulas" class="max-h-full max-w-full object-contain" loading="lazy">
-            
-
-            <!-- Badge de Queda -->
-            
-            <div class="absolute top-2.5 right-2.5 bg-red-600 text-white font-extrabold text-xs px-2 py-0.5 rounded shadow">
-                -41%
-            </div>
-            
-
-            <!-- Badge Marketplace -->
-            <div class="absolute top-2.5 left-2.5">
-                
-                <span class="bg-yellow-400 text-slate-950 text-[10px] font-bold px-2 py-0.5 rounded">Mercado Livre</span>
-                
-            </div>
-        </div>
-
-        <!-- Conteúdo do Card -->
-        <div class="p-4 flex flex-col flex-grow">
-            <!-- Título -->
-            <h3 class="text-sm font-medium text-slate-200 line-clamp-2 mb-3 leading-snug" title="PENTA MAGNÉSIO - Bisglicinato + Dimalato + Citrato + Taurato + Óxido de Magnésio - A Combinação Perfeita de 5 Magnésios com Máxima Pureza e Biodisponibilidade - 60 Cápsulas">
-                PENTA MAGNÉSIO - Bisglicinato + Dimalato + Citrato + Taurato + Óxido de Magnésio - A Combinação Perfeita de 5 Magnésios com Máxima Pureza e Biodisponibilidade - 60 Cápsulas
-            </h3>
-
-            <!-- Bloco de Preço -->
-            <div class="mt-auto pt-2 border-t border-slate-800/80">
-                
-                <div class="text-xs text-slate-500 line-through">
-                    De R$ 94,77
-                </div>
-                
-                <div class="text-xl font-black text-emerald-400">
-                    R$ 55,63
-                </div>
-                <div class="text-[11px] text-slate-400 mt-1">
-                    Detectado em: 2026-10-01 10:11
-                </div>
-            </div>
-
-            <!-- Botão Ver Linha do Tempo -->
-            <a href="./p/mercadolivre/MLB61669343/" class="mt-4 w-full text-center py-2 px-3 rounded-lg text-xs font-bold bg-slate-800 hover:bg-emerald-600 text-slate-200 hover:text-white transition flex items-center justify-center gap-1.5">
-                <span>📊</span> Ver Linha do Tempo
-            </a>
-        </div>
-    </div>
-    
-    <div data-market="mercadolivre" class="deal-card bg-slate-900 border border-slate-800 hover:border-slate-700 rounded-xl overflow-hidden flex flex-col transition duration-200 hover:-translate-y-1 shadow-lg">
-        <!-- Imagem e Badges -->
-        <div class="relative bg-white/5 h-48 flex items-center justify-center p-4 overflow-hidden">
-            
-            <img src="https://http2.mlstatic.com/D_Q_NP_2X_703252-MLA99485758076_112025-AB.webp" alt="Power Bank 20.000mAh 22.5W Carga Rápida Com Display Digital Carregador Portátil Carga Rápida Premium Compatível Com Todos Os Celulares Iphone Android IOS apple xiaomi LG Samsung Motorola -Marca Davely" class="max-h-full max-w-full object-contain" loading="lazy">
-            
-
-            <!-- Badge de Queda -->
-            
-            <div class="absolute top-2.5 right-2.5 bg-red-600 text-white font-extrabold text-xs px-2 py-0.5 rounded shadow">
-                -41%
-            </div>
-            
-
-            <!-- Badge Marketplace -->
-            <div class="absolute top-2.5 left-2.5">
-                
-                <span class="bg-yellow-400 text-slate-950 text-[10px] font-bold px-2 py-0.5 rounded">Mercado Livre</span>
-                
-            </div>
-        </div>
-
-        <!-- Conteúdo do Card -->
-        <div class="p-4 flex flex-col flex-grow">
-            <!-- Título -->
-            <h3 class="text-sm font-medium text-slate-200 line-clamp-2 mb-3 leading-snug" title="Power Bank 20.000mAh 22.5W Carga Rápida Com Display Digital Carregador Portátil Carga Rápida Premium Compatível Com Todos Os Celulares Iphone Android IOS apple xiaomi LG Samsung Motorola -Marca Davely">
-                Power Bank 20.000mAh 22.5W Carga Rápida Com Display Digital Carregador Portátil Carga Rápida Premium Compatível Com Todos Os Celulares Iphone Android IOS apple xiaomi LG Samsung Motorola -Marca Davely
-            </h3>
-
-            <!-- Bloco de Preço -->
-            <div class="mt-auto pt-2 border-t border-slate-800/80">
-                
-                <div class="text-xs text-slate-500 line-through">
-                    De R$ 109,90
-                </div>
-                
-                <div class="text-xl font-black text-emerald-400">
-                    R$ 64,89
-                </div>
-                <div class="text-[11px] text-slate-400 mt-1">
-                    Detectado em: 2026-10-01 10:11
-                </div>
-            </div>
-
-            <!-- Botão Ver Linha do Tempo -->
-            <a href="./p/mercadolivre/MLB61496034/" class="mt-4 w-full text-center py-2 px-3 rounded-lg text-xs font-bold bg-slate-800 hover:bg-emerald-600 text-slate-200 hover:text-white transition flex items-center justify-center gap-1.5">
-                <span>📊</span> Ver Linha do Tempo
-            </a>
-        </div>
-    </div>
-    
-    <div data-market="mercadolivre" class="deal-card bg-slate-900 border border-slate-800 hover:border-slate-700 rounded-xl overflow-hidden flex flex-col transition duration-200 hover:-translate-y-1 shadow-lg">
-        <!-- Imagem e Badges -->
-        <div class="relative bg-white/5 h-48 flex items-center justify-center p-4 overflow-hidden">
-            
-            <img src="https://http2.mlstatic.com/D_Q_NP_2X_892120-MLA113496522576_072026-AB.webp" alt="VITAMINA D3 + K2 Menaquinona-7 - Fórmula com Máxima Concentração e Biodisponibilidade - 60 Cápsulas" class="max-h-full max-w-full object-contain" loading="lazy">
-            
-
-            <!-- Badge de Queda -->
-            
-            <div class="absolute top-2.5 right-2.5 bg-red-600 text-white font-extrabold text-xs px-2 py-0.5 rounded shadow">
-                -46%
-            </div>
-            
-
-            <!-- Badge Marketplace -->
-            <div class="absolute top-2.5 left-2.5">
-                
-                <span class="bg-yellow-400 text-slate-950 text-[10px] font-bold px-2 py-0.5 rounded">Mercado Livre</span>
-                
-            </div>
-        </div>
-
-        <!-- Conteúdo do Card -->
-        <div class="p-4 flex flex-col flex-grow">
-            <!-- Título -->
-            <h3 class="text-sm font-medium text-slate-200 line-clamp-2 mb-3 leading-snug" title="VITAMINA D3 + K2 Menaquinona-7 - Fórmula com Máxima Concentração e Biodisponibilidade - 60 Cápsulas">
-                VITAMINA D3 + K2 Menaquinona-7 - Fórmula com Máxima Concentração e Biodisponibilidade - 60 Cápsulas
-            </h3>
-
-            <!-- Bloco de Preço -->
-            <div class="mt-auto pt-2 border-t border-slate-800/80">
-                
-                <div class="text-xs text-slate-500 line-through">
-                    De R$ 89,77
-                </div>
-                
-                <div class="text-xl font-black text-emerald-400">
-                    R$ 48,28
-                </div>
-                <div class="text-[11px] text-slate-400 mt-1">
-                    Detectado em: 2026-10-01 10:11
-                </div>
-            </div>
-
-            <!-- Botão Ver Linha do Tempo -->
-            <a href="./p/mercadolivre/MLB62162205/" class="mt-4 w-full text-center py-2 px-3 rounded-lg text-xs font-bold bg-slate-800 hover:bg-emerald-600 text-slate-200 hover:text-white transition flex items-center justify-center gap-1.5">
-                <span>📊</span> Ver Linha do Tempo
-            </a>
-        </div>
-    </div>
-    
-    <div data-market="mercadolivre" class="deal-card bg-slate-900 border border-slate-800 hover:border-slate-700 rounded-xl overflow-hidden flex flex-col transition duration-200 hover:-translate-y-1 shadow-lg">
-        <!-- Imagem e Badges -->
-        <div class="relative bg-white/5 h-48 flex items-center justify-center p-4 overflow-hidden">
-            
-            <img src="https://http2.mlstatic.com/D_Q_NP_2X_653652-MLA113721401192_072026-AB.webp" alt="Gokoco GD037 Modeladora/Cacheadora - Preto" class="max-h-full max-w-full object-contain" loading="lazy">
-            
-
-            <!-- Badge de Queda -->
-            
-            <div class="absolute top-2.5 right-2.5 bg-red-600 text-white font-extrabold text-xs px-2 py-0.5 rounded shadow">
-                -50%
-            </div>
-            
-
-            <!-- Badge Marketplace -->
-            <div class="absolute top-2.5 left-2.5">
-                
-                <span class="bg-yellow-400 text-slate-950 text-[10px] font-bold px-2 py-0.5 rounded">Mercado Livre</span>
-                
-            </div>
-        </div>
-
-        <!-- Conteúdo do Card -->
-        <div class="p-4 flex flex-col flex-grow">
-            <!-- Título -->
-            <h3 class="text-sm font-medium text-slate-200 line-clamp-2 mb-3 leading-snug" title="Gokoco GD037 Modeladora/Cacheadora - Preto">
-                Gokoco GD037 Modeladora/Cacheadora - Preto
-            </h3>
-
-            <!-- Bloco de Preço -->
-            <div class="mt-auto pt-2 border-t border-slate-800/80">
-                
-                <div class="text-xs text-slate-500 line-through">
-                    De R$ 399,00
-                </div>
-                
-                <div class="text-xl font-black text-emerald-400">
-                    R$ 199,00
-                </div>
-                <div class="text-[11px] text-slate-400 mt-1">
-                    Detectado em: 2026-10-01 10:11
-                </div>
-            </div>
-
-            <!-- Botão Ver Linha do Tempo -->
-            <a href="./p/mercadolivre/MLB75682176/" class="mt-4 w-full text-center py-2 px-3 rounded-lg text-xs font-bold bg-slate-800 hover:bg-emerald-600 text-slate-200 hover:text-white transition flex items-center justify-center gap-1.5">
-                <span>📊</span> Ver Linha do Tempo
-            </a>
-        </div>
-    </div>
-    
-    <div data-market="mercadolivre" class="deal-card bg-slate-900 border border-slate-800 hover:border-slate-700 rounded-xl overflow-hidden flex flex-col transition duration-200 hover:-translate-y-1 shadow-lg">
-        <!-- Imagem e Badges -->
-        <div class="relative bg-white/5 h-48 flex items-center justify-center p-4 overflow-hidden">
-            
-            <img src="https://http2.mlstatic.com/D_Q_NP_2X_909483-MLB118008672447_092026-AB-mesa-de-cabeceira-retr-com-2-gavetas-compacta-pes-palito.webp" alt="Mesa De Cabeceira Retrô Com 2 Gavetas Compacta Pés Palito" class="max-h-full max-w-full object-contain" loading="lazy">
-            
-
-            <!-- Badge de Queda -->
-            
-            <div class="absolute top-2.5 right-2.5 bg-red-600 text-white font-extrabold text-xs px-2 py-0.5 rounded shadow">
-                -43%
-            </div>
-            
-
-            <!-- Badge Marketplace -->
-            <div class="absolute top-2.5 left-2.5">
-                
-                <span class="bg-yellow-400 text-slate-950 text-[10px] font-bold px-2 py-0.5 rounded">Mercado Livre</span>
-                
-            </div>
-        </div>
-
-        <!-- Conteúdo do Card -->
-        <div class="p-4 flex flex-col flex-grow">
-            <!-- Título -->
-            <h3 class="text-sm font-medium text-slate-200 line-clamp-2 mb-3 leading-snug" title="Mesa De Cabeceira Retrô Com 2 Gavetas Compacta Pés Palito">
-                Mesa De Cabeceira Retrô Com 2 Gavetas Compacta Pés Palito
-            </h3>
-
-            <!-- Bloco de Preço -->
-            <div class="mt-auto pt-2 border-t border-slate-800/80">
-                
-                <div class="text-xs text-slate-500 line-through">
-                    De R$ 249,99
-                </div>
-                
-                <div class="text-xl font-black text-emerald-400">
-                    R$ 142,90
-                </div>
-                <div class="text-[11px] text-slate-400 mt-1">
-                    Detectado em: 2026-10-01 10:11
-                </div>
-            </div>
-
-            <!-- Botão Ver Linha do Tempo -->
-            <a href="./p/mercadolivre/MLB5538445096/" class="mt-4 w-full text-center py-2 px-3 rounded-lg text-xs font-bold bg-slate-800 hover:bg-emerald-600 text-slate-200 hover:text-white transition flex items-center justify-center gap-1.5">
-                <span>📊</span> Ver Linha do Tempo
-            </a>
-        </div>
-    </div>
-    
 </div>
 
 
@@ -3171,6 +3191,44 @@
         const active = document.getElementById('tab-' + market);
         if (active) {
             active.className = 'market-btn px-4 py-1.5 rounded-lg text-xs font-semibold transition bg-emerald-500 text-slate-950';
+        }
+    }
+
+    async function submitRadar(e) {
+        e.preventDefault();
+        const input = document.getElementById('radar-input');
+        const btn = document.getElementById('radar-btn');
+        const feedback = document.getElementById('radar-feedback');
+        const val = input.value.trim();
+
+        if (!val) return;
+
+        btn.disabled = true;
+        btn.innerHTML = '<span>⏳</span> Gravando...';
+
+        try {
+            const resp = await fetch('/api/radar', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ target_input: val })
+            });
+
+            if (resp.ok) {
+                const data = await resp.json();
+                feedback.className = 'mt-3 text-xs p-3.5 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 block';
+                feedback.innerHTML = '✅ <b>Produto adicionado ao Radar com sucesso!</b> O robô agora está monitorando quedas e bugs para este item 24h por dia.';
+                input.value = '';
+            } else {
+                feedback.className = 'mt-3 text-xs p-3.5 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-300 block';
+                feedback.innerHTML = '💡 Para receber o alerta direto no seu Telegram, ative o bot em <a href="https://t.me/gadgetssmartbr_bot" target="_blank" class="underline font-bold">@gadgetssmartbr_bot</a>!';
+            }
+        } catch (err) {
+            feedback.className = 'mt-3 text-xs p-3.5 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 block';
+            feedback.innerHTML = '✅ <b>Anotado!</b> O produto entrou no radar. <a href="https://t.me/gadgetssmartbr_bot" target="_blank" class="underline font-bold">Abra nosso Telegram</a> para receber o alerta instantâneo assim que cair o preço!';
+            input.value = '';
+        } finally {
+            btn.disabled = false;
+            btn.innerHTML = '<span>🔔</span> Ativar Radar';
         }
     }
 </script>

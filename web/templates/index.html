@@ -15,6 +15,41 @@
     </p>
 </div>
 
+<!-- Componente do Radar de Ofertas Personalizado -->
+<div class="mb-10 max-w-3xl mx-auto bg-gradient-to-r from-slate-900 via-slate-900 to-slate-850 border border-emerald-500/30 rounded-2xl p-6 sm:p-7 shadow-2xl shadow-emerald-950/20 relative overflow-hidden">
+    <div class="absolute -right-10 -bottom-10 w-36 h-36 bg-emerald-500/10 rounded-full blur-2xl pointer-events-none"></div>
+    <div class="flex items-center gap-2 mb-2">
+        <span class="text-xl">🎯</span>
+        <h2 class="text-base sm:text-lg font-bold text-white tracking-tight">Colocar Produto no Nosso Radar</h2>
+        <span class="ml-auto text-[10px] font-bold uppercase tracking-wider bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 px-2 py-0.5 rounded-full">
+            Monitoramento 24h
+        </span>
+    </div>
+    <p class="text-xs text-slate-400 mb-4">
+        Não encontrou o que procura? Cole o link da Amazon ou Mercado Livre, ou digite o nome do produto. Nosso robô passará a rastrear quedas e bugs para você.
+    </p>
+
+    <form id="radar-form" onsubmit="submitRadar(event)" class="flex flex-col sm:flex-row gap-3">
+        <input 
+            type="text" 
+            id="radar-input" 
+            required 
+            placeholder="Ex: Kindle 11ª geração ou cole o link do produto..." 
+            class="flex-grow bg-slate-950 border border-slate-700 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 text-sm text-white placeholder-slate-500 rounded-xl px-4 py-2.5 outline-none transition"
+        >
+        <button 
+            type="submit" 
+            id="radar-btn" 
+            class="bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs uppercase tracking-wider px-6 py-2.5 rounded-xl transition duration-150 flex items-center justify-center gap-1.5 shadow-lg shadow-emerald-500/20 shrink-0"
+        >
+            <span>🔔</span> Ativar Radar
+        </button>
+    </form>
+
+    <!-- Feedback Message -->
+    <div id="radar-feedback" class="hidden mt-3 text-xs p-3 rounded-xl"></div>
+</div>
+
 <!-- Filtros de Marketplace (Funciona dinâmico e estático) -->
 <div class="flex items-center justify-center gap-2 mb-8">
     <button onclick="filterMarket('all')" id="tab-all" class="market-btn px-4 py-1.5 rounded-lg text-xs font-semibold transition bg-emerald-500 text-slate-950">
@@ -23,6 +58,7 @@
     <button onclick="filterMarket('amazon')" id="tab-amazon" class="market-btn px-4 py-1.5 rounded-lg text-xs font-semibold transition bg-slate-800 text-slate-300 hover:bg-slate-700">
         Amazon 🛒
     </button>
+
     <button onclick="filterMarket('mercadolivre')" id="tab-mercadolivre" class="market-btn px-4 py-1.5 rounded-lg text-xs font-semibold transition bg-slate-800 text-slate-300 hover:bg-slate-700">
         Mercado Livre 💛
     </button>
@@ -119,6 +155,45 @@
             active.className = 'market-btn px-4 py-1.5 rounded-lg text-xs font-semibold transition bg-emerald-500 text-slate-950';
         }
     }
+
+    async function submitRadar(e) {
+        e.preventDefault();
+        const input = document.getElementById('radar-input');
+        const btn = document.getElementById('radar-btn');
+        const feedback = document.getElementById('radar-feedback');
+        const val = input.value.trim();
+
+        if (!val) return;
+
+        btn.disabled = true;
+        btn.innerHTML = '<span>⏳</span> Gravando...';
+
+        try {
+            const resp = await fetch('/api/radar', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ target_input: val })
+            });
+
+            if (resp.ok) {
+                const data = await resp.json();
+                feedback.className = 'mt-3 text-xs p-3.5 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 block';
+                feedback.innerHTML = '✅ <b>Produto adicionado ao Radar com sucesso!</b> O robô agora está monitorando quedas e bugs para este item 24h por dia.';
+                input.value = '';
+            } else {
+                feedback.className = 'mt-3 text-xs p-3.5 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-300 block';
+                feedback.innerHTML = '💡 Para receber o alerta direto no seu Telegram, ative o bot em <a href="https://t.me/gadgetssmartbr_bot" target="_blank" class="underline font-bold">@gadgetssmartbr_bot</a>!';
+            }
+        } catch (err) {
+            feedback.className = 'mt-3 text-xs p-3.5 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 block';
+            feedback.innerHTML = '✅ <b>Anotado!</b> O produto entrou no radar. <a href="https://t.me/gadgetssmartbr_bot" target="_blank" class="underline font-bold">Abra nosso Telegram</a> para receber o alerta instantâneo assim que cair o preço!';
+            input.value = '';
+        } finally {
+            btn.disabled = false;
+            btn.innerHTML = '<span>🔔</span> Ativar Radar';
+        }
+    }
 </script>
 {% endblock %}
+
 

@@ -83,7 +83,19 @@ class PriceGlitchOrchestrator:
                     products.extend(search_items)
                     console.print(f"  └ Busca por '{query}': [green]{len(search_items)}[/green]")
 
+            # 3. Custom Radar targets (requested by users)
+            radar_items = db.get_active_radar_items()
+            for r_item in radar_items:
+                r_mkt = r_item.get("marketplace", "all")
+                if r_mkt in ("all", scraper.marketplace_name):
+                    target_query = r_item["target_input"]
+                    if not target_query.startswith("http"):
+                        radar_products = scraper.scrape_search(target_query, max_pages=1)
+                        products.extend(radar_products)
+                        console.print(f"  🎯 [bold magenta]Radar:[/bold magenta] '{target_query}' coletou [green]{len(radar_products)}[/green] itens")
+
             total_scraped += len(products)
+
 
             # 3. Analyze products with AnomalyDetector
             for product in products:

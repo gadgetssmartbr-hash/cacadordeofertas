@@ -33,10 +33,13 @@ class Settings:
     TELEGRAM_CHAT_ID: str = os.getenv("TELEGRAM_CHAT_ID", "")
 
     # Affiliate Tags & Keys
-    AMAZON_TAG: str = os.getenv("AMAZON_TAG", "promohunter-20")
+    AMAZON_TAG: str = os.getenv("AMAZON_TAG", "gadgetssmartb-20")
     MERCADOLIVRE_AFFILIATE_TAG: str = os.getenv("MERCADOLIVRE_AFFILIATE_TAG", "")
+    ML_WISHLIST_ID: str = os.getenv("ML_WISHLIST_ID", "d3d29148-7134-40ad-80d6-ae644d99754c")
+    ML_WISHLIST_URL: str = os.getenv("ML_WISHLIST_URL", "")
     SHOPEE_AFFILIATE_ID: str = os.getenv("SHOPEE_AFFILIATE_ID", "")
     LOMADEE_SOURCE_ID: str = os.getenv("LOMADEE_SOURCE_ID", "")
+
 
     # Google Gemini AI (Optional for automated high-converting copy)
     GEMINI_API_KEY: str = os.getenv("GEMINI_API_KEY", "")

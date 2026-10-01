@@ -84,9 +84,43 @@ async def get_product_json(marketplace: str, product_id: str):
     }
 
 
+from pydantic import BaseModel
+
+
+class RadarRequest(BaseModel):
+    target_input: str
+    desired_price: Optional[float] = None
+    user_contact: Optional[str] = None
+
+
+@app.post("/api/radar")
+async def add_to_radar(req: RadarRequest):
+    """Registers a product URL or search term into the active tracking radar."""
+    if not req.target_input or len(req.target_input.strip()) < 3:
+        raise HTTPException(status_code=400, detail="Informe um link de produto ou nome válido com pelo menos 3 caracteres.")
+
+    item = db.add_radar_item(
+        target_input=req.target_input,
+        desired_price=req.desired_price,
+        user_contact=req.user_contact,
+    )
+    return {
+        "status": "success",
+        "message": f"Produto adicionado ao Radar com sucesso! Nosso agente passará a monitorá-lo 24h por dia.",
+        "item": item,
+    }
+
+
+@app.get("/api/radar")
+async def list_radar():
+    """Lists active radar targets."""
+    return {"radar_items": db.get_active_radar_items()}
+
+
 @app.get("/health")
 async def health_check():
     return {"status": "ok", "app": "PriceGlitch Micro-Web"}
+
 
 
 def run_server(host: str = "127.0.0.1", port: int = 8000):
