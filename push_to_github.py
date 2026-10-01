@@ -5,8 +5,17 @@ Usage:
 """
 
 import sys
+
+if sys.platform.startswith("win"):
+    try:
+        sys.stdout.reconfigure(encoding="utf-8")
+        sys.stderr.reconfigure(encoding="utf-8")
+    except AttributeError:
+        pass
+
 from dulwich import porcelain
 from dulwich.client import HTTPUnauthorized
+
 
 REPO_URL = "https://github.com/gadgetssmartbr-hash/cacadordeofertas.git"
 
