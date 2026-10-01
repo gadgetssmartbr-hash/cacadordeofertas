@@ -118,7 +118,17 @@ class ProductResolver:
     @staticmethod
     def _resolve_query(query: str) -> Optional[Dict[str, Any]]:
         """Resolves a product by name/search term using Amazon live search and local DB."""
-        # 1. Check local database for exact or close title match
+        query_lower = query.lower()
+        accessory_words = [
+            "controle", "joystick", "gamepad", "headset", "fone de ouvido",
+            "capa", "case", "capinha", "pelicula", "película", "adesivo", "skin",
+            "suporte", "estojo", "bag", "protetor", "silicone", "pulseira",
+            "carregador", "cabo", "base carregadora", "dock", "docking",
+            "bateria extra", "fonte de alimentacao", "adaptador"
+        ]
+        wants_accessory = any(re.search(rf"\b{aw}\b", query_lower) for aw in accessory_words)
+
+        # 1. Check local database (only accept if not an unwanted accessory)
         with db._get_connection() as conn:
             cur = conn.cursor()
             cur.execute("""
@@ -127,35 +137,39 @@ class ProductResolver:
                 LEFT JOIN price_history h ON p.marketplace = h.marketplace AND p.product_id = h.product_id
                 WHERE p.title LIKE ?
                 ORDER BY h.timestamp DESC
-                LIMIT 1
+                LIMIT 5
             """, (f"%{query}%",))
-            row = cur.fetchone()
-            if row:
-                return {
-                    "marketplace": row["marketplace"],
-                    "product_id": row["product_id"],
-                    "title": row["title"],
-                    "current_price": row["current_price"],
-                    "image_url": row["image_url"],
-                    "url": row["url"],
-                    "target_input": query,
-                }
+            rows = cur.fetchall()
+            for row in rows:
+                title_lower = row["title"].lower()
+                is_acc = any(re.search(rf"\b{aw}\b", title_lower) for aw in accessory_words)
+                if wants_accessory or not is_acc:
+                    return {
+                        "marketplace": row["marketplace"],
+                        "product_id": row["product_id"],
+                        "title": row["title"],
+                        "current_price": row["current_price"],
+                        "image_url": row["image_url"],
+                        "url": row["url"],
+                        "target_input": query,
+                    }
 
         # 2. Search Amazon Brazil live
         try:
             amz = AmazonScraper()
             items = amz.scrape_search(query, max_pages=1)
-            if items:
-                # Filter items: check accessory and relevance
-                accessory_words = ["capa", "case", "capinha", "pelicula", "película", "adesivo", "suporte", "estojo", "protetor", "silicone", "pulseira"]
-                wants_accessory = any(aw in query.lower() for aw in accessory_words)
+            if not items and "console" in query_lower:
+                # Retry without 'console' prefix if specific query yielded 0
+                fallback_query = query_lower.replace("console", "").strip()
+                items = amz.scrape_search(fallback_query, max_pages=1)
 
+            if items:
                 # Prioritize non-accessory matching items first
                 valid_items = []
                 for itm in items:
                     title_lower = itm.title.lower()
-                    is_accessory = any(re.search(rf"\b{aw}\b", title_lower) for aw in accessory_words)
-                    if wants_accessory or not is_accessory:
+                    is_acc = any(re.search(rf"\b{aw}\b", title_lower) for aw in accessory_words)
+                    if wants_accessory or not is_acc:
                         valid_items.append(itm)
 
                 chosen_items = valid_items if valid_items else items
