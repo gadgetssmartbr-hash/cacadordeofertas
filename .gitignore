@@ -1,0 +1,23 @@
+# Environment secrets
+.env
+
+# Python bytecode
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# Virtual environments
+env/
+venv/
+ENV/
+.venv
+
+# Local data cache (keep database local)
+data/*.db
+data/*.sqlite3
+
+# OS generated
+.DS_Store
+Thumbs.db

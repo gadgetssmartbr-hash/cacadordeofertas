@@ -1,0 +1,124 @@
+{% extends "base.html" %}
+
+{% block title %}Linha do Tempo de Ofertas & Glitches • Caçador de Ofertas{% endblock %}
+
+{% block content %}
+<div class="mb-8 text-center max-w-2xl mx-auto">
+    <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-red-500/10 text-red-400 border border-red-500/20 mb-3">
+        <span>🚨</span> Monitor de Descontos e Anomalias de Sistema
+    </div>
+    <h1 class="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">
+        Linha do Tempo de <span class="text-emerald-400">Preços & Quedas</span>
+    </h1>
+    <p class="mt-2 text-slate-400 text-sm">
+        Acompanhe a variação real de valores dos produtos detectados pelo nosso agente autônomo.
+    </p>
+</div>
+
+<!-- Filtros de Marketplace (Funciona dinâmico e estático) -->
+<div class="flex items-center justify-center gap-2 mb-8">
+    <button onclick="filterMarket('all')" id="tab-all" class="market-btn px-4 py-1.5 rounded-lg text-xs font-semibold transition bg-emerald-500 text-slate-950">
+        Todas as Lojas
+    </button>
+    <button onclick="filterMarket('amazon')" id="tab-amazon" class="market-btn px-4 py-1.5 rounded-lg text-xs font-semibold transition bg-slate-800 text-slate-300 hover:bg-slate-700">
+        Amazon 🛒
+    </button>
+    <button onclick="filterMarket('mercadolivre')" id="tab-mercadolivre" class="market-btn px-4 py-1.5 rounded-lg text-xs font-semibold transition bg-slate-800 text-slate-300 hover:bg-slate-700">
+        Mercado Livre 💛
+    </button>
+</div>
+
+<!-- Grid de Ofertas -->
+{% if deals %}
+<div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+    {% for deal in deals %}
+    <div data-market="{{ deal.marketplace }}" class="deal-card bg-slate-900 border border-slate-800 hover:border-slate-700 rounded-xl overflow-hidden flex flex-col transition duration-200 hover:-translate-y-1 shadow-lg">
+        <!-- Imagem e Badges -->
+        <div class="relative bg-white/5 h-48 flex items-center justify-center p-4 overflow-hidden">
+            {% if deal.image_url %}
+            <img src="{{ deal.image_url }}" alt="{{ deal.title }}" class="max-h-full max-w-full object-contain" loading="lazy">
+            {% else %}
+            <div class="text-slate-600 text-4xl">📦</div>
+            {% endif %}
+
+            <!-- Badge de Queda -->
+            {% if deal.discount_percent and deal.discount_percent > 0 %}
+            <div class="absolute top-2.5 right-2.5 bg-red-600 text-white font-extrabold text-xs px-2 py-0.5 rounded shadow">
+                -{{ deal.discount_percent|round|int }}%
+            </div>
+            {% endif %}
+
+            <!-- Badge Marketplace -->
+            <div class="absolute top-2.5 left-2.5">
+                {% if deal.marketplace == 'amazon' %}
+                <span class="bg-amber-500/90 text-slate-950 text-[10px] font-bold px-2 py-0.5 rounded">Amazon</span>
+                {% elif deal.marketplace == 'mercadolivre' %}
+                <span class="bg-yellow-400 text-slate-950 text-[10px] font-bold px-2 py-0.5 rounded">Mercado Livre</span>
+                {% else %}
+                <span class="bg-slate-700 text-white text-[10px] font-bold px-2 py-0.5 rounded">{{ deal.marketplace }}</span>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Conteúdo do Card -->
+        <div class="p-4 flex flex-col flex-grow">
+            <!-- Título -->
+            <h3 class="text-sm font-medium text-slate-200 line-clamp-2 mb-3 leading-snug" title="{{ deal.title }}">
+                {{ deal.title }}
+            </h3>
+
+            <!-- Bloco de Preço -->
+            <div class="mt-auto pt-2 border-t border-slate-800/80">
+                {% if deal.original_price and deal.original_price > deal.price_alerted %}
+                <div class="text-xs text-slate-500 line-through">
+                    De R$ {{ "%.2f"|format(deal.original_price)|replace(".", ",") }}
+                </div>
+                {% endif %}
+                <div class="text-xl font-black text-emerald-400">
+                    R$ {{ "%.2f"|format(deal.price_alerted)|replace(".", ",") }}
+                </div>
+                <div class="text-[11px] text-slate-400 mt-1">
+                    Detectado em: {{ deal.sent_at[:16] }}
+                </div>
+            </div>
+
+            <!-- Botão Ver Linha do Tempo -->
+            <a href="{{ base_path or '/' }}p/{{ deal.marketplace }}/{{ deal.product_id }}/" class="mt-4 w-full text-center py-2 px-3 rounded-lg text-xs font-bold bg-slate-800 hover:bg-emerald-600 text-slate-200 hover:text-white transition flex items-center justify-center gap-1.5">
+                <span>📊</span> Ver Linha do Tempo
+            </a>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<div class="bg-slate-900 border border-slate-800 rounded-xl p-12 text-center max-w-lg mx-auto">
+    <div class="text-5xl mb-4">🔍</div>
+    <h3 class="text-lg font-bold text-white">Nenhum alerta recente encontrado</h3>
+    <p class="text-sm text-slate-400 mt-1">
+        O agente está monitorando os marketplaces. Conforme novas anomalias forem detectadas, elas aparecerão aqui automaticamente.
+    </p>
+</div>
+{% endif %}
+{% endblock %}
+
+{% block scripts %}
+<script>
+    function filterMarket(market) {
+        document.querySelectorAll('.deal-card').forEach(card => {
+            if (market === 'all' || card.dataset.market === market) {
+                card.style.display = '';
+            } else {
+                card.style.display = 'none';
+            }
+        });
+        document.querySelectorAll('.market-btn').forEach(btn => {
+            btn.className = 'market-btn px-4 py-1.5 rounded-lg text-xs font-semibold transition bg-slate-800 text-slate-300 hover:bg-slate-700';
+        });
+        const active = document.getElementById('tab-' + market);
+        if (active) {
+            active.className = 'market-btn px-4 py-1.5 rounded-lg text-xs font-semibold transition bg-emerald-500 text-slate-950';
+        }
+    }
+</script>
+{% endblock %}
+

@@ -1,0 +1,188 @@
+{% extends "base.html" %}
+
+{% block title %}{{ product.title[:60] }} • Linha do Tempo de Preço{% endblock %}
+
+{% block content %}
+<!-- Breadcrumb -->
+<div class="mb-6 flex items-center gap-2 text-xs text-slate-400">
+    <a href="{{ base_path or '/' }}" class="hover:text-white transition">Início</a>
+    <span>/</span>
+    <span class="capitalize text-slate-300">{{ product.marketplace }}</span>
+    <span>/</span>
+    <span class="text-slate-500 truncate max-w-xs">{{ product.product_id }}</span>
+</div>
+
+
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start mb-10">
+    <!-- Imagem e CTA -->
+    <div class="lg:col-span-4 bg-slate-900 border border-slate-800 rounded-2xl p-6 flex flex-col items-center shadow-xl">
+        <div class="w-full h-64 flex items-center justify-center p-4 bg-white/5 rounded-xl mb-6">
+            {% if product.image_url %}
+            <img src="{{ product.image_url }}" alt="{{ product.title }}" class="max-h-full max-w-full object-contain">
+            {% else %}
+            <div class="text-slate-600 text-6xl">📦</div>
+            {% endif %}
+        </div>
+
+        <!-- Botão de Compra com Link de Afiliado -->
+        <a href="{{ affiliate_url }}" target="_blank" rel="noopener noreferrer" class="w-full py-4 px-6 rounded-xl font-black text-sm uppercase tracking-wider bg-emerald-500 hover:bg-emerald-400 text-slate-950 transition duration-200 text-center shadow-lg shadow-emerald-500/20 flex items-center justify-center gap-2">
+            <span>🛒</span> Ir para a Loja Oficial
+        </a>
+        <p class="text-[11px] text-slate-500 mt-2.5 text-center">
+            Link seguro e oficial verificado pelo Caçador de Ofertas.
+        </p>
+    </div>
+
+    <!-- Informações do Produto e Métricas -->
+    <div class="lg:col-span-8 space-y-6">
+        <div>
+            <div class="flex items-center gap-2 mb-2">
+                {% if product.marketplace == 'amazon' %}
+                <span class="bg-amber-500/20 text-amber-400 border border-amber-500/30 text-xs font-bold px-2.5 py-0.5 rounded-full">Amazon Brasil</span>
+                {% elif product.marketplace == 'mercadolivre' %}
+                <span class="bg-yellow-400/20 text-yellow-300 border border-yellow-400/30 text-xs font-bold px-2.5 py-0.5 rounded-full">Mercado Livre</span>
+                {% else %}
+                <span class="bg-slate-700 text-white text-xs font-bold px-2.5 py-0.5 rounded-full">{{ product.marketplace }}</span>
+                {% endif %}
+                <span class="text-xs text-slate-500">ID: {{ product.product_id }}</span>
+            </div>
+            <h1 class="text-xl sm:text-2xl font-bold text-white leading-snug">
+                {{ product.title }}
+            </h1>
+        </div>
+
+        <!-- Cards de Preço e Estatísticas -->
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+            <div class="bg-slate-900 border border-slate-800 p-3.5 rounded-xl">
+                <span class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">Preço Atual</span>
+                <div class="text-xl font-black text-emerald-400 mt-0.5">
+                    R$ {{ "%.2f"|format(product.current_price)|replace(".", ",") }}
+                </div>
+            </div>
+            <div class="bg-slate-900 border border-slate-800 p-3.5 rounded-xl">
+                <span class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">Menor Preço</span>
+                <div class="text-xl font-bold text-cyan-400 mt-0.5">
+                    R$ {{ "%.2f"|format(stats.min_price or product.current_price)|replace(".", ",") }}
+                </div>
+            </div>
+            <div class="bg-slate-900 border border-slate-800 p-3.5 rounded-xl">
+                <span class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">Média Recente</span>
+                <div class="text-xl font-bold text-slate-300 mt-0.5">
+                    R$ {{ "%.2f"|format(stats.avg_price or product.current_price)|replace(".", ",") }}
+                </div>
+            </div>
+            <div class="bg-slate-900 border border-slate-800 p-3.5 rounded-xl">
+                <span class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">Amostragens</span>
+                <div class="text-xl font-bold text-slate-400 mt-0.5">
+                    {{ stats.count }} pontos
+                </div>
+            </div>
+        </div>
+
+        <!-- Bloco do Gráfico -->
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl">
+            <div class="flex items-center justify-between mb-4">
+                <div>
+                    <h2 class="text-base font-bold text-white flex items-center gap-2">
+                        <span>📈</span> Linha do Tempo de Preços
+                    </h2>
+                    <p class="text-xs text-slate-400">Histórico de leituras registradas pelo robô</p>
+                </div>
+                <div class="text-xs font-semibold px-2.5 py-1 rounded bg-slate-800 text-slate-300">
+                    Tempo Real
+                </div>
+            </div>
+
+            <!-- Canvas do Chart.js -->
+            <div class="relative h-72 w-full">
+                <canvas id="priceTimelineChart"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    const timelineData = {{ timeline | tojson }};
+    
+    if (timelineData && timelineData.length > 0) {
+        const labels = timelineData.map(d => {
+            const date = new Date(d.timestamp);
+            return date.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' });
+        });
+        const prices = timelineData.map(d => d.price);
+
+        const ctx = document.getElementById('priceTimelineChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Preço Praticado (R$)',
+                    data: prices,
+                    borderColor: '#10b981',
+                    backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                    borderWidth: 2.5,
+                    fill: true,
+                    tension: 0.2,
+                    pointBackgroundColor: '#10b981',
+                    pointBorderColor: '#0b1120',
+                    pointBorderWidth: 2,
+                    pointRadius: 4,
+                    pointHoverRadius: 7
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+                    tooltip: {
+                        backgroundColor: '#1e293b',
+                        titleColor: '#f8fafc',
+                        bodyColor: '#10b981',
+                        titleFont: { size: 12, weight: 'bold' },
+                        bodyFont: { size: 14, weight: 'bold' },
+                        padding: 10,
+                        borderColor: '#334155',
+                        borderWidth: 1,
+                        displayColors: false,
+                        callbacks: {
+                            label: function(context) {
+                                return 'R$ ' + context.parsed.y.toLocaleString('pt-BR', { minimumFractionDigits: 2 });
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        grid: {
+                            color: 'rgba(51, 65, 85, 0.4)'
+                        },
+                        ticks: {
+                            color: '#94a3b8',
+                            font: { size: 10 },
+                            maxRotation: 45
+                        }
+                    },
+                    y: {
+                        grid: {
+                            color: 'rgba(51, 65, 85, 0.4)'
+                        },
+                        ticks: {
+                            color: '#94a3b8',
+                            font: { size: 11 },
+                            callback: function(value) {
+                                return 'R$ ' + value;
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    }
+</script>
+{% endblock %}

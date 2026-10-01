@@ -1,0 +1,16 @@
+# Core scraping & networking (with TLS fingerprint impersonation for Amazon, Shopee & ML)
+curl_cffi>=0.16.0
+beautifulsoup4>=4.15.0
+soupsieve>=2.10
+httpx>=0.28.0
+requests>=2.34.0
+
+# Settings & Environment
+python-dotenv>=1.2.0
+pydantic>=2.13.0
+
+# Terminal UI & Diagnostics
+rich>=15.0.0
+
+# AI Copywriting (Optional Gemini Integration)
+google-genai>=2.25.0
