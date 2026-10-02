@@ -74,7 +74,7 @@ class TelegramNotifier:
 
         # Telegram rejects 'localhost' and '127.0.0.1' in inline button URLs
         if settings.MICRO_SITE_URL and not any(h in settings.MICRO_SITE_URL.lower() for h in ("localhost", "127.0.0.1")):
-            history_url = f"{settings.MICRO_SITE_URL}/p/{product.marketplace}/{product.product_id}"
+            history_url = f"{settings.MICRO_SITE_URL.rstrip('/')}/p/{product.marketplace}/{product.product_id}/"
             buttons.append([{"text": "📊 VER GRÁFICO DE PREÇOS", "url": history_url}])
 
         reply_markup = {"inline_keyboard": buttons}

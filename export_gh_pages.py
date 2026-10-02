@@ -22,11 +22,13 @@ TEMPLATES_DIR = BASE_DIR / "web" / "templates"
 DOCS_DIR = BASE_DIR / "docs"
 
 
-def export_to_github_pages(output_dir: Path = DOCS_DIR, limit_deals: int = 60) -> dict:
+def export_to_github_pages(output_dir: Path = DOCS_DIR, limit_deals: int = 100) -> dict:
     """
     Renders all templates and writes static HTML files into output_dir (docs/).
     """
     output_dir.mkdir(parents=True, exist_ok=True)
+    data_dir = output_dir / "data"
+    data_dir.mkdir(parents=True, exist_ok=True)
 
     # 1. Create .nojekyll (tells GitHub Pages not to process files with Jekyll)
     nojekyll_file = output_dir / ".nojekyll"
@@ -49,16 +51,32 @@ def export_to_github_pages(output_dir: Path = DOCS_DIR, limit_deals: int = 60) -
     )
     (output_dir / "index.html").write_text(index_html, encoding="utf-8")
 
-    # 3. Render individual product pages: docs/p/{marketplace}/{product_id}/index.html
+    # 3. Render 404.html (Dynamic SPA fallback)
+    try:
+        template_404 = env.get_template("404.html")
+        html_404 = template_404.render(
+            base_path="./",
+            is_static=True,
+        )
+        (output_dir / "404.html").write_text(html_404, encoding="utf-8")
+    except Exception as e:
+        logger.warning(f"Could not render 404.html: {e}")
+
+    # 4. Render individual product pages: docs/p/{marketplace}/{product_id}/index.html
     product_template = env.get_template("product.html")
     products_exported = 0
+    all_products_data = {}
 
-    # Collect unique products from alerts and database
+    # Collect unique products from deals, alerts, and database
     seen_products = set()
     for deal in deals:
-        mkt = deal["marketplace"]
-        pid = deal["product_id"]
-        seen_products.add((mkt, pid))
+        seen_products.add((deal["marketplace"], deal["product_id"]))
+
+    for alert in db.get_recent_alerts(limit=200):
+        seen_products.add((alert["marketplace"], alert["product_id"]))
+
+    for prod in db.get_all_tracked_products(limit=300):
+        seen_products.add((prod["marketplace"], prod["product_id"]))
 
     for mkt, pid in seen_products:
         prod = db.get_product(mkt, pid)
@@ -69,6 +87,24 @@ def export_to_github_pages(output_dir: Path = DOCS_DIR, limit_deals: int = 60) -
         stats = db.get_historical_stats(mkt, pid)
         raw_url = prod.get("url") or ""
         affiliate_url = monetizer.monetize(raw_url, mkt)
+
+        # Store in json data lookup
+        prod_key = f"{mkt.lower()}:{pid}"
+        all_products_data[prod_key] = {
+            "marketplace": mkt,
+            "product_id": pid,
+            "title": prod.get("title", ""),
+            "url": raw_url,
+            "affiliate_url": affiliate_url,
+            "image_url": prod.get("image_url", ""),
+            "current_price": prod.get("current_price", 0.0),
+            "original_price": prod.get("original_price"),
+            "discount_percent": prod.get("discount_percent"),
+            "min_price": stats.get("min_price", prod.get("current_price", 0.0)),
+            "avg_price": stats.get("avg_price", prod.get("current_price", 0.0)),
+            "count": stats.get("count", len(timeline)),
+            "timeline": timeline,
+        }
 
         prod_dir = output_dir / "p" / mkt / pid
         prod_dir.mkdir(parents=True, exist_ok=True)
@@ -83,6 +119,12 @@ def export_to_github_pages(output_dir: Path = DOCS_DIR, limit_deals: int = 60) -
         )
         (prod_dir / "index.html").write_text(prod_html, encoding="utf-8")
         products_exported += 1
+
+    # 5. Export JSON data feed for dynamic lookups
+    (data_dir / "products.json").write_text(
+        json.dumps({"products": all_products_data}, ensure_ascii=False, indent=2),
+        encoding="utf-8"
+    )
 
     logger.info(f"GitHub Pages export completed: {products_exported} product pages generated in '{output_dir}'.")
     return {

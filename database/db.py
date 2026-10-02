@@ -381,6 +381,18 @@ class PriceDatabase:
                 WHERE status = 'active'
                 ORDER BY created_at DESC
             """)
+    def get_all_tracked_products(self, limit: Optional[int] = None) -> List[Dict[str, Any]]:
+        """Retrieves all tracked products in the database."""
+        with self._get_connection() as conn:
+            cursor = conn.cursor()
+            query = """
+                SELECT marketplace, product_id, title, url, image_url, category, last_updated
+                FROM products
+                ORDER BY last_updated DESC
+            """
+            if limit:
+                query += f" LIMIT {int(limit)}"
+            cursor.execute(query)
             return [dict(row) for row in cursor.fetchall()]
 
 
