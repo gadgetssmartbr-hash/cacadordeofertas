@@ -55,7 +55,8 @@ class ProductResolver:
 
                         # Image
                         img_elem = soup.find("img", id="landingImage") or soup.find("img", id="imgBlkFront")
-                        image_url = img_elem.get("src") if img_elem else None
+                        raw_img = img_elem.get("src") if img_elem else None
+                        image_url = BaseScraper.clean_image_url(raw_img, "amazon")
 
                         # ASIN
                         asin_match = re.search(r"/(?:dp|gp/product)/([A-Z0-9]{10})", url)
@@ -86,7 +87,8 @@ class ProductResolver:
                     # Avoid generic site pages
                     if title and "Mercado Livre" not in title and "Suspicious" not in title:
                         og_img = soup.find("meta", property="og:image")
-                        image_url = og_img.get("content") if og_img else None
+                        raw_img = og_img.get("content") if og_img else None
+                        image_url = BaseScraper.clean_image_url(raw_img, "mercadolivre")
 
                         # Price
                         price_elem = soup.select_one(".andes-money-amount__fraction")

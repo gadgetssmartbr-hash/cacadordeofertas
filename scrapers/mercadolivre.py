@@ -157,7 +157,8 @@ class MercadoLivreScraper(BaseScraper):
                 img_elem = item.select_one("img.poly-component__picture") or item.select_one("img.ui-search-result-image__element") or item.select_one("img")
                 image_url = None
                 if img_elem:
-                    image_url = img_elem.get("data-src") or img_elem.get("src")
+                    raw_img = img_elem.get("data-src") or img_elem.get("src")
+                    image_url = self.clean_image_url(raw_img, self.marketplace_name)
 
                 product = ScrapedProduct(
                     marketplace=self.marketplace_name,

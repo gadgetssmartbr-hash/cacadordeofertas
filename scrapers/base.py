@@ -78,3 +78,17 @@ class BaseScraper(ABC):
         # Keep base URL path and drop tracking parameters
         clean_url = f"{parsed.scheme}://{parsed.netloc}{parsed.path}"
         return clean_url
+
+    @staticmethod
+    def clean_image_url(image_url: Optional[str], marketplace: Optional[str] = None) -> Optional[str]:
+        """Upgrades low-res thumbnails to clean, ultra-high resolution real product photos."""
+        if not image_url:
+            return None
+        url = image_url.strip()
+        # Amazon: Upgrade to high-resolution direct photo
+        if (marketplace and "amazon" in marketplace.lower()) or "media-amazon.com" in url or "ssl-images-amazon" in url:
+            url = re.sub(r"\._[A-Z0-9_,]+_\.(jpg|jpeg|png|webp)", r"._AC_SL1500_.\1", url)
+        # Mercado Livre: Upgrade from thumbnail (-I, -V) to original high-res photo (-O)
+        elif (marketplace and "mercadolivre" in marketplace.lower()) or "mlstatic.com" in url:
+            url = re.sub(r"-([IVTC])\.(jpg|webp|jpeg|png)", r"-O.\2", url)
+        return url

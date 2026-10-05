@@ -119,7 +119,8 @@ class AmazonScraper(BaseScraper):
                 image_url = None
                 img_elem = item.find("img", class_="s-image")
                 if img_elem:
-                    image_url = img_elem.get("src")
+                    raw_img = img_elem.get("src")
+                    image_url = self.clean_image_url(raw_img, self.marketplace_name)
 
                 # Clean Amazon URL
                 clean_url = f"https://www.amazon.com.br/dp/{asin}"

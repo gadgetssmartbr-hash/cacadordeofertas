@@ -381,6 +381,8 @@ class PriceDatabase:
                 WHERE status = 'active'
                 ORDER BY created_at DESC
             """)
+            return [dict(row) for row in cursor.fetchall()]
+
     def get_all_tracked_products(self, limit: Optional[int] = None) -> List[Dict[str, Any]]:
         """Retrieves all tracked products in the database."""
         with self._get_connection() as conn:
