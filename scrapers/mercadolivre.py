@@ -23,27 +23,47 @@ class MercadoLivreScraper(BaseScraper):
     def __init__(self):
         self.session = requests.Session()
         self.session.headers.update({
-            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
-            "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8",
-            "Accept-Language": "pt-BR,pt;q=0.9,en-US;q=0.8,en;q=0.7",
+            "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36",
+            "accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8",
+            "accept-language": "pt-BR,pt;q=0.9,en-US;q=0.8,en;q=0.7",
+            "sec-ch-ua": '"Google Chrome";v="129", "Not=A?Brand";v="8", "Chromium";v="129"',
+            "sec-ch-ua-mobile": "?0",
+            "sec-ch-ua-platform": '"Windows"',
+            "sec-fetch-dest": "document",
+            "sec-fetch-mode": "navigate",
+            "sec-fetch-site": "none",
+            "sec-fetch-user": "?1",
+            "upgrade-insecure-requests": "1",
         })
 
-    def scrape_deals(self, max_pages: int = 1) -> List[ScrapedProduct]:
-        """Scrapes Mercado Livre's main daily and lightning deals section."""
+    def scrape_deals(self, max_pages: int = 2) -> List[ScrapedProduct]:
+        """Scrapes Mercado Livre's main deals and specialized Toys/Games sections."""
         products = []
-        for page in range(1, max_pages + 1):
-            url = f"https://www.mercadolivre.com.br/ofertas?page={page}"
-            try:
-                response = self.session.get(url, impersonate="chrome", timeout=20)
-                if response.status_code != 200:
-                    logger.warning(f"[MLB] Unexpected status {response.status_code} on {url}")
-                    continue
+        deal_endpoints = [
+            "https://www.mercadolivre.com.br/ofertas?category=MLB1132",  # Brinquedos e Hobbies
+            "https://www.mercadolivre.com.br/c/brinquedos-e-hobbies",     # Categoria Brinquedos
+            "https://www.mercadolivre.com.br/ofertas?category=MLB1144",  # Games
+            "https://www.mercadolivre.com.br/ofertas",                  # Geral
+        ]
 
-                page_products = self._parse_items_from_html(response.text)
-                products.extend(page_products)
-                time.sleep(settings.REQUEST_DELAY_SECONDS)
-            except Exception as e:
-                logger.error(f"[MLB] Error scraping deals page {page}: {e}")
+        for base_url in deal_endpoints:
+            for page in range(1, max_pages + 1):
+                if "c/brinquedos" in base_url and page > 1:
+                    continue  # Category portal page is single page
+                separator = "&" if "?" in base_url else "?"
+                url = f"{base_url}{separator}page={page}"
+                try:
+                    response = self.session.get(url, impersonate="chrome", timeout=20)
+                    if response.status_code != 200 or "account-verification" in response.url:
+                        logger.debug(f"[MLB] Skipping verification endpoint on {url}")
+                        continue
+
+                    category_tag = "Brinquedos" if "MLB1132" in base_url or "brinquedos" in base_url else ("Games" if "MLB1144" in base_url else "Ofertas")
+                    page_products = self._parse_items_from_html(response.text, default_category=category_tag)
+                    products.extend(page_products)
+                    time.sleep(settings.REQUEST_DELAY_SECONDS)
+                except Exception as e:
+                    logger.error(f"[MLB] Error scraping deals from {url}: {e}")
         return products
 
     def scrape_search(self, query: str, max_pages: int = 1) -> List[ScrapedProduct]:
@@ -59,8 +79,8 @@ class MercadoLivreScraper(BaseScraper):
 
             try:
                 response = self.session.get(url, impersonate="chrome", timeout=20)
-                if response.status_code != 200:
-                    logger.warning(f"[MLB] Status {response.status_code} for search {query}")
+                if response.status_code != 200 or "account-verification" in response.url:
+                    logger.debug(f"[MLB] Search '{query}' redirected to verification, skipping.")
                     continue
 
                 page_products = self._parse_items_from_html(response.text, default_category=query)

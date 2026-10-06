@@ -190,35 +190,29 @@ class PriceDatabase:
         marketplace: str,
         product_id: str,
         current_price: float,
-        cooldown_hours: Optional[int] = None,
     ) -> bool:
         """
-        Checks if an alert for this product was already sent recently.
-        Returns True if:
-        1. No alert was ever sent.
-        2. Last alert was sent more than `cooldown_hours` ago.
-        3. Or current price is significantly lower (>= 10% lower) than the last alerted price.
+        Strict Anti-Repetition & Price Record Engine:
+        - Never re-alerts a product at the same or higher price than previously alerted.
+        - Only allows a new alert if the current price is strictly cheaper (at least 5% lower)
+          than the lowest price ever alerted for this product.
         """
-        hours = cooldown_hours if cooldown_hours is not None else settings.ALERT_COOLDOWN_HOURS
-        since = (datetime.utcnow() - timedelta(hours=hours)).strftime("%Y-%m-%d %H:%M:%S")
-
         with self._get_connection() as conn:
             cursor = conn.cursor()
             cursor.execute("""
-                SELECT price_alerted, sent_at
+                SELECT MIN(price_alerted) as min_alerted, MAX(sent_at) as last_sent
                 FROM alerts_sent
-                WHERE marketplace = ? AND product_id = ? AND sent_at >= ?
-                ORDER BY sent_at DESC
-                LIMIT 1
-            """, (marketplace, product_id, since))
+                WHERE marketplace = ? AND product_id = ?
+            """, (marketplace, product_id))
             row = cursor.fetchone()
 
-            if not row:
-                return True  # No alert in cooldown window
+            if not row or row["min_alerted"] is None:
+                return True  # Product was never alerted before
 
-            last_price = row["price_alerted"]
-            # If price dropped an additional 10% below what was already alerted, trigger again!
-            if current_price < (last_price * 0.90):
+            min_alerted = float(row["min_alerted"])
+
+            # Must beat the all-time lowest alerted price by at least 5%
+            if current_price < (min_alerted * 0.95):
                 return True
 
             return False

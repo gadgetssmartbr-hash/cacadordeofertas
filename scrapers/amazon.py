@@ -32,13 +32,13 @@ class AmazonScraper(BaseScraper):
         Scrapes Amazon deals across high-discount categories (40%+ and 50%+ off filters).
         """
         products = []
-        # Target keywords that often feature high-converting tech and home glitches
+        # Target high-converting toys and gifts for Dia das Crianças
         deal_queries = [
-            "eletronicos",
-            "smart home",
-            "informatica",
+            "brinquedos",
+            "lego",
+            "jogos infantis",
+            "bonecas",
             "games",
-            "audio",
         ]
 
         for query in deal_queries[:max_pages]:
