@@ -78,7 +78,7 @@ class PriceGlitchOrchestrator:
 
             # 2. Targeted search queries (optional for deeper scanning)
             if include_search:
-                for query in settings.SEARCH_QUERIES[:2]:
+                for query in settings.SEARCH_QUERIES[:4]:
                     search_items = scraper.scrape_search(query, max_pages=1)
                     products.extend(search_items)
                     console.print(f"  └ Busca por '{query}': [green]{len(search_items)}[/green]")

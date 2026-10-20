@@ -2,6 +2,7 @@
 Mercado Livre Scraper for Deals and Sudden Drops.
 """
 
+import os
 import logging
 import re
 import time
@@ -36,29 +37,43 @@ class MercadoLivreScraper(BaseScraper):
             "upgrade-insecure-requests": "1",
         })
 
-    def scrape_deals(self, max_pages: int = 2) -> List[ScrapedProduct]:
-        """Scrapes Mercado Livre's main deals and specialized Toys/Games sections."""
+        # Load authenticated browser session cookies if available to prevent captcha wall
+        session_dir = r"C:\Agentes\ML\.browser_session"
+        if os.path.exists(session_dir):
+            try:
+                from playwright.sync_api import sync_playwright
+                with sync_playwright() as p:
+                    ctx = p.chromium.launch_persistent_context(session_dir, channel="chrome", headless=True)
+                    cookie_dict = {c['name']: c['value'] for c in ctx.cookies() if 'mercadolivre.com' in c.get('domain', '')}
+                    ctx.close()
+                if cookie_dict:
+                    self.session.cookies.update(cookie_dict)
+                    logger.info(f"[MLB] Loaded {len(cookie_dict)} session cookies from browser profile.")
+            except Exception as e:
+                logger.debug(f"[MLB] Could not load browser session cookies: {e}")
+
+    def scrape_deals(self, max_pages: int = 1) -> List[ScrapedProduct]:
+        """Scrapes Mercado Livre's main deals and high-converting categories (Supplements, Tech, Home)."""
         products = []
         deal_endpoints = [
-            "https://www.mercadolivre.com.br/ofertas?category=MLB1132",  # Brinquedos e Hobbies
-            "https://www.mercadolivre.com.br/c/brinquedos-e-hobbies",     # Categoria Brinquedos
-            "https://www.mercadolivre.com.br/ofertas?category=MLB1144",  # Games
-            "https://www.mercadolivre.com.br/ofertas",                  # Geral
+            ("https://www.mercadolivre.com.br/ofertas", "Ofertas"),
+            ("https://www.mercadolivre.com.br/ofertas?category=MLB1271", "Suplementos e Fitness"),
+            ("https://www.mercadolivre.com.br/ofertas?category=MLB1051", "Celulares"),
+            ("https://www.mercadolivre.com.br/ofertas?category=MLB1000", "Eletrônicos"),
+            ("https://www.mercadolivre.com.br/ofertas?category=MLB1648", "Informática"),
+            ("https://www.mercadolivre.com.br/ofertas?category=MLB1144", "Games"),
         ]
 
-        for base_url in deal_endpoints:
+        for base_url, category_tag in deal_endpoints:
             for page in range(1, max_pages + 1):
-                if "c/brinquedos" in base_url and page > 1:
-                    continue  # Category portal page is single page
                 separator = "&" if "?" in base_url else "?"
                 url = f"{base_url}{separator}page={page}"
                 try:
-                    response = self.session.get(url, impersonate="chrome", timeout=20)
-                    if response.status_code != 200 or "account-verification" in response.url:
+                    response = self.session.get(url, impersonate="chrome124", timeout=20)
+                    if response.status_code != 200 or "account-verification" in response.url or "captcha" in response.url:
                         logger.debug(f"[MLB] Skipping verification endpoint on {url}")
                         continue
 
-                    category_tag = "Brinquedos" if "MLB1132" in base_url or "brinquedos" in base_url else ("Games" if "MLB1144" in base_url else "Ofertas")
                     page_products = self._parse_items_from_html(response.text, default_category=category_tag)
                     products.extend(page_products)
                     time.sleep(settings.REQUEST_DELAY_SECONDS)

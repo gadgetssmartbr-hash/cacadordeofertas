@@ -60,23 +60,22 @@ class Settings:
     SCAN_INTERVAL_MINUTES: int = int(os.getenv("SCAN_INTERVAL_MINUTES", "30"))
     REQUEST_DELAY_SECONDS: float = float(os.getenv("REQUEST_DELAY_SECONDS", "2.0"))
 
-    # Search categories/keywords to watch for drops (Foco em Brinquedos / Dia das Crianças)
+    # Search categories/keywords to watch for drops
     SEARCH_QUERIES: list[str] = [
-        "lego",
-        "hot wheels pista",
-        "boneca barbie",
-        "patinete infantil",
-        "nintendo switch",
+        "whey protein",
+        "creatina",
+        "whey protein isolado",
+        "alexa echo",
+        "fone bluetooth anc",
+        "ssd nvme 1tb",
+        "monitor gamer",
+        "smartwatch amoled",
+        "aspirador robo",
+        "kindle",
         "playstation 5",
-        "jogos tabuleiro",
-        "bicicleta infantil",
-        "nerf",
-        "massinha play doh",
-        "brinquedos educativos",
-        "boneco marvel homem aranha",
-        "carrinho controle remoto",
-        "tablet infantil",
-        "pula pula cama elastica",
+        "placa de video",
+        "smart tv 4k",
+        "caixa som bluetooth",
     ]
 
 

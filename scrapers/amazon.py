@@ -32,29 +32,31 @@ class AmazonScraper(BaseScraper):
         Scrapes Amazon deals across high-discount categories (40%+ and 50%+ off filters).
         """
         products = []
-        # Target high-converting toys and gifts for Dia das Crianças
+        # Target high-converting categories with sudden discounts (Whey/Supplements, Tech, Games)
         deal_queries = [
-            "brinquedos",
-            "lego",
-            "jogos infantis",
-            "bonecas",
+            "whey protein",
+            "creatina",
+            "eletronicos",
+            "smart home",
+            "informatica",
             "games",
         ]
 
-        for query in deal_queries[:max_pages]:
-            # pct-off=40- filters directly for items with >= 40% discount
-            url = f"https://www.amazon.com.br/s?k={query}&pct-off=40-"
-            try:
-                response = self.session.get(url, impersonate="chrome", timeout=20)
-                if response.status_code != 200:
-                    logger.warning(f"[Amazon] Unexpected status {response.status_code} on {url}")
-                    continue
+        for query in deal_queries:
+            for page in range(1, max_pages + 1):
+                # pct-off=20- filters for items with >= 20% discount
+                url = f"https://www.amazon.com.br/s?k={query.replace(' ', '+')}&pct-off=20-&page={page}"
+                try:
+                    response = self.session.get(url, impersonate="chrome", timeout=20)
+                    if response.status_code != 200:
+                        logger.warning(f"[Amazon] Unexpected status {response.status_code} on {url}")
+                        continue
 
-                items = self._parse_search_results(response.text, default_category=query)
-                products.extend(items)
-                time.sleep(settings.REQUEST_DELAY_SECONDS)
-            except Exception as e:
-                logger.error(f"[Amazon] Error scraping deals for {query}: {e}")
+                    items = self._parse_search_results(response.text, default_category=query)
+                    products.extend(items)
+                    time.sleep(settings.REQUEST_DELAY_SECONDS)
+                except Exception as e:
+                    logger.error(f"[Amazon] Error scraping deals for {query}: {e}")
 
         return products
 
